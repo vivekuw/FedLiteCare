@@ -33,11 +33,14 @@ Training CSV files should include these columns:
 
 Prediction CSV files can omit the `Outcome` column. If it is included, the prediction script will also report accuracy.
 
-## Aggregator Workflow
+## Full Local Federated Workflow
 
-1. Train each hospital locally so each site has its own `.pt` checkpoint in its own `models/` folder.
-2. Run the aggregator server entrypoint to start the next federated round.
-3. The aggregator copies the three local hospital checkpoints into `Aggregator_Server/received_models/round_xxx/`.
-4. FedAvg combines the three hospital model state dictionaries into one global model.
-5. The aggregated checkpoint is saved both as a round-specific version and as the latest global model.
-6. Round history and model version history are updated automatically.
+1. The aggregator creates or loads the current global model.
+2. The current global model is copied into each hospital's `communication/received_global_models/` folder.
+3. Each hospital loads that copied global model and trains locally on its own CSV dataset.
+4. Each hospital saves its own standalone local model in `models/`.
+5. Each hospital also saves a round-specific update checkpoint in `communication/local_model_updates/`.
+6. The aggregator copies those three update files into `Aggregator_Server/received_models/round_xxx/`.
+7. FedAvg combines the three local updates into a new global checkpoint.
+8. The aggregator saves the new global checkpoint as both a round-specific version and the latest global model.
+9. The aggregator appends a simple human-readable round entry to `Aggregator_Server/logs/round_log.log`.

@@ -2,6 +2,8 @@ hospital_name: Hospital_B
 uploads_dir: uploads
 models_dir: models
 logs_dir: logs
+received_global_models_dir: communication/received_global_models
+local_updates_dir: communication/local_model_updates
 dataset_filename: hospital_b_diabetes.csv
 model_filename: hospital_b_diabetes_classifier.pt
 training_log_filename: training.log

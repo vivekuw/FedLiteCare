@@ -30,16 +30,44 @@ def main() -> None:
         default=None,
         help="Optional CSV filename inside the uploads directory.",
     )
+    parser.add_argument(
+        "--initial-model",
+        type=Path,
+        default=None,
+        help="Optional starting global model checkpoint path.",
+    )
+    parser.add_argument(
+        "--local-update-path",
+        type=Path,
+        default=None,
+        help="Optional output path for a round-specific local update checkpoint.",
+    )
+    parser.add_argument(
+        "--round-name",
+        type=str,
+        default=None,
+        help="Optional federated round name, such as round_001.",
+    )
     args = parser.parse_args()
 
-    result = train_local_model(config_path=args.config, dataset_filename=args.dataset)
+    result = train_local_model(
+        config_path=args.config,
+        dataset_filename=args.dataset,
+        initial_model_path=args.initial_model,
+        local_update_path=args.local_update_path,
+        round_name=args.round_name,
+    )
     print(f"Hospital: {result['hospital_name']}")
     print(f"Dataset loaded from: {result['dataset_path']}")
+    if result["initial_model_path"] is not None:
+        print(f"Starting from global model: {result['initial_model_path']}")
     print(f"Training device: {result['device']}")
     print(f"Rows used - train: {result['training_rows']}, validation: {result['validation_rows']}")
     print(f"Validation loss: {result['validation_loss']:.4f}")
     print(f"Validation accuracy: {result['validation_accuracy']:.4f}")
     print(f"Model saved to: {result['model_path']}")
+    if result["local_update_path"] is not None:
+        print(f"Local update saved to: {result['local_update_path']}")
     print(f"Training log updated: {result['log_path']}")
 
 

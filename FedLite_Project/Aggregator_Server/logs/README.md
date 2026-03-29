@@ -1,3 +1,6 @@
 # Aggregator Logs
 
-Local aggregation runs append to `aggregator.log`.
+Local federated runs append to:
+
+- `aggregator.log`
+- `round_log.log`

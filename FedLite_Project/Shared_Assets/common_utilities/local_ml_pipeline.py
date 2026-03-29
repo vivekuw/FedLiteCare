@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 from typing import Any
 
 import torch
@@ -46,6 +47,18 @@ def load_hospital_context(config_path: Path) -> tuple[dict[str, Any], dict[str, 
     logs_dir = ensure_directory(
         resolve_path(hospital_root, str(settings.get("logs_dir", "logs")))
     )
+    received_global_models_dir = ensure_directory(
+        resolve_path(
+            hospital_root,
+            str(settings.get("received_global_models_dir", "communication/received_global_models")),
+        )
+    )
+    local_updates_dir = ensure_directory(
+        resolve_path(
+            hospital_root,
+            str(settings.get("local_updates_dir", "communication/local_model_updates")),
+        )
+    )
 
     return settings, {
         "config_path": resolved_config_path,
@@ -53,6 +66,8 @@ def load_hospital_context(config_path: Path) -> tuple[dict[str, Any], dict[str, 
         "uploads_dir": uploads_dir,
         "models_dir": models_dir,
         "logs_dir": logs_dir,
+        "received_global_models_dir": received_global_models_dir,
+        "local_updates_dir": local_updates_dir,
     }
 
 
@@ -66,9 +81,24 @@ def _resolve_optional_cli_path(path: Path | None, default_path: Path) -> Path:
     return _resolve_existing_path(path)
 
 
+def get_hospital_round_transfer_paths(config_path: Path, round_name: str) -> dict[str, Path]:
+    """Return round-specific inbound and outbound model paths for a hospital."""
+    settings, paths = load_hospital_context(config_path)
+    hospital_name = str(settings.get("hospital_name", paths["hospital_root"].name))
+    hospital_slug = hospital_name.lower()
+
+    return {
+        "received_global_model_path": paths["received_global_models_dir"] / f"{round_name}_global_model.pt",
+        "local_update_path": paths["local_updates_dir"] / f"{round_name}_{hospital_slug}_update.pt",
+    }
+
+
 def train_local_model(
     config_path: Path,
     dataset_filename: str | None = None,
+    initial_model_path: Path | None = None,
+    local_update_path: Path | None = None,
+    round_name: str | None = None,
 ) -> dict[str, Any]:
     """Train a local diabetes model using hospital-specific config and data."""
     settings, paths = load_hospital_context(config_path)
@@ -86,6 +116,14 @@ def train_local_model(
         paths["logs_dir"],
         str(settings.get("training_log_filename", "training.log")),
     )
+    resolved_initial_model_path = _resolve_existing_path(initial_model_path) if initial_model_path else None
+    resolved_local_update_path = (
+        _resolve_existing_path(local_update_path) if local_update_path else None
+    )
+    if round_name and resolved_local_update_path is None:
+        resolved_local_update_path = get_hospital_round_transfer_paths(config_path, round_name)[
+            "local_update_path"
+        ]
 
     records = load_csv_records(dataset_path)
     features, labels, preprocessing = fit_preprocessor(
@@ -107,6 +145,10 @@ def train_local_model(
         input_dim=features.shape[1],
         hidden_dim=int(settings.get("hidden_dim", 16)),
     )
+    if resolved_initial_model_path is not None:
+        _, base_checkpoint = load_checkpoint(resolved_initial_model_path, torch.device("cpu"))
+        model.load_state_dict(base_checkpoint["model_state_dict"])
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     trained_model, history, validation_metrics = train_classifier(
         model=model,
@@ -128,14 +170,20 @@ def train_local_model(
         training_metrics=validation_metrics,
         history=history,
     )
+    if resolved_local_update_path is not None:
+        ensure_directory(resolved_local_update_path.parent)
+        shutil.copy2(model_path, resolved_local_update_path)
 
     append_log_entry(
         training_log_path,
         title="Training run",
         details={
             "hospital_name": hospital_name,
+            "round_name": round_name or "standalone",
             "dataset_path": dataset_path,
+            "initial_model_path": "None" if resolved_initial_model_path is None else resolved_initial_model_path,
             "model_path": model_path,
+            "local_update_path": "None" if resolved_local_update_path is None else resolved_local_update_path,
             "device": device,
             "training_rows": len(train_dataset),
             "validation_rows": len(validation_dataset),
@@ -148,6 +196,9 @@ def train_local_model(
         "hospital_name": hospital_name,
         "dataset_path": dataset_path,
         "model_path": model_path,
+        "initial_model_path": resolved_initial_model_path,
+        "local_update_path": resolved_local_update_path,
+        "round_name": round_name,
         "log_path": training_log_path,
         "device": str(device),
         "training_rows": len(train_dataset),
