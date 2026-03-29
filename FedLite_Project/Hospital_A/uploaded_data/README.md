@@ -1,3 +1,3 @@
 # Hospital A Uploaded Data
 
-Placeholder directory for Hospital A training data files.
+Phase 2 uses the sibling `uploads/` folder as the active CSV input directory.

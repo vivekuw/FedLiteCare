@@ -1,0 +1,1 @@
+"""FedLiteCare project package."""

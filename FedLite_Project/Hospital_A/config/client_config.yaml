@@ -1,1 +1,12 @@
-# Placeholder configuration for Hospital A client.
+hospital_name: Hospital_A
+uploads_dir: uploads
+models_dir: models
+dataset_filename: diabetes_sample.csv
+model_filename: diabetes_classifier.pt
+target_column: Outcome
+validation_ratio: 0.25
+batch_size: 4
+epochs: 80
+learning_rate: 0.001
+hidden_dim: 16
+random_seed: 42

@@ -1,0 +1,1 @@
+"""Hospital A client entrypoints."""

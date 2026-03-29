@@ -1,3 +1,3 @@
 # Hospital A Local Models
 
-Placeholder directory for Hospital A local model checkpoints.
+Phase 2 uses the sibling `models/` folder as the active checkpoint directory.

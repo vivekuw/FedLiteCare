@@ -1,3 +1,5 @@
 # Test Input Samples
 
-Placeholder location for sample inputs used during testing and demos.
+Sample CSV inputs for quick prediction checks live here.
+
+Current sample file: `diabetes_prediction_sample.csv`
