@@ -1,3 +1,3 @@
 # Aggregator Logs
 
-Placeholder directory for aggregator runtime logs.
+Local aggregation runs append to `aggregator.log`.

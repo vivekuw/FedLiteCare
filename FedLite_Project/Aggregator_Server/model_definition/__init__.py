@@ -1,0 +1,1 @@
+"""Aggregator model definitions."""

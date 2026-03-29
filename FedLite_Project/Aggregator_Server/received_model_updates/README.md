@@ -1,3 +1,5 @@
 # Received Model Updates
 
-Placeholder directory for client model update files received by the aggregator.
+Legacy placeholder folder from the initial scaffold.
+
+The active local aggregation workflow now stores incoming hospital checkpoints in the sibling `received_models/` directory.

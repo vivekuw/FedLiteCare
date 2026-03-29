@@ -1,1 +1,11 @@
-# Placeholder aggregator server configuration.
+server_name: FedLiteCare_Aggregator
+received_models_dir: received_models
+global_models_dir: saved_global_model_versions
+logs_dir: logs
+latest_global_model_filename: global_model_latest.pt
+version_history_filename: version_history.json
+round_state_filename: round_state.json
+aggregation_log_filename: aggregator.log
+hospital_a_model_source: ../Hospital_A/models/hospital_a_diabetes_classifier.pt
+hospital_b_model_source: ../Hospital_B/models/hospital_b_diabetes_classifier.pt
+hospital_c_model_source: ../Hospital_C/models/hospital_c_diabetes_classifier.pt

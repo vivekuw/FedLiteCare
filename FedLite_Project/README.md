@@ -15,7 +15,7 @@ FedLiteCare is a one-laptop simulation of a federated learning system for diabet
 
 ## Current Status
 
-The project now supports lightweight local diabetes training and prediction for Hospital A, Hospital B, and Hospital C on the same laptop.
+The project now supports lightweight local diabetes training and prediction for Hospital A, Hospital B, and Hospital C on the same laptop, plus a local aggregator backend for federated rounds.
 
 ## Local ML Layout
 
@@ -24,6 +24,8 @@ The project now supports lightweight local diabetes training and prediction for 
 - Each hospital saves its own model checkpoint in `Hospital_X/models/`.
 - Each hospital appends its own training and prediction logs in `Hospital_X/logs/`.
 - Shared reusable model, preprocessing, and config utilities live under `Shared_Assets/`.
+- The aggregator copies hospital checkpoints into `Aggregator_Server/received_models/`.
+- Aggregated global checkpoints are stored in `Aggregator_Server/saved_global_model_versions/`.
 - The master sample dataset lives in `Datasets/original_dataset/diabetes_master_dataset.csv`.
 - Reference split files live in `Datasets/Hospital_A_split/`, `Datasets/Hospital_B_split/`, and `Datasets/Hospital_C_split/`.
 
@@ -36,3 +38,4 @@ The project now supports lightweight local diabetes training and prediction for 
 - Predict with Hospital B default data: `python FedLite_Project/Hospital_B/prediction/predict_diabetes.py`
 - Predict with Hospital C default data: `python FedLite_Project/Hospital_C/prediction/predict_diabetes.py`
 - Predict with a shared sample input: `python FedLite_Project/Hospital_A/prediction/predict_diabetes.py --input FedLite_Project/Datasets/test_input_samples/diabetes_prediction_sample.csv`
+- Run one aggregation round: `python FedLite_Project/Aggregator_Server/server/server_main.py`
