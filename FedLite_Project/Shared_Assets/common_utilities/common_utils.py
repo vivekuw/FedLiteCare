@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -64,3 +65,18 @@ def load_simple_yaml_config(config_path: Path) -> dict[str, Any]:
         key, value = line.split(":", 1)
         config[key.strip()] = _parse_scalar(value)
     return config
+
+
+def append_log_entry(log_path: Path, title: str, details: dict[str, Any]) -> Path:
+    """Append a readable timestamped entry to a hospital log file."""
+    ensure_directory(log_path.parent)
+    timestamp = datetime.now().isoformat(timespec="seconds")
+
+    with log_path.open("a", encoding="utf-8") as handle:
+        handle.write(f"[{timestamp}] {title}\n")
+        for key, value in details.items():
+            rendered_value = value if not isinstance(value, Path) else str(value)
+            handle.write(f"{key}: {rendered_value}\n")
+        handle.write("\n")
+
+    return log_path

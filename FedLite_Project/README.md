@@ -9,24 +9,30 @@ FedLiteCare is a one-laptop simulation of a federated learning system for diabet
 - `Hospital_B/` - Local client workspace for Hospital B, including training, prediction, storage, communication, and logs.
 - `Hospital_C/` - Local client workspace for Hospital C, including training, prediction, storage, communication, and logs.
 - `Shared_Assets/` - Reusable helpers for utilities, shared model functions, and preprocessing support.
-- `Datasets/` - Placeholders for the original dataset, hospital-specific splits, and test input samples.
+- `Datasets/` - Master dataset samples, hospital-specific split CSV files, and test input samples.
 - `Documentation/` - Notes for architecture, workflow, and future deployment planning.
 - `Demo_Outputs/` - Reserved space for screenshots, demo logs, and test output artifacts.
 
 ## Current Status
 
-Phase 2 adds a lightweight local machine learning pipeline for Hospital A only.
+The project now supports lightweight local diabetes training and prediction for Hospital A, Hospital B, and Hospital C on the same laptop.
 
-## Phase 2 Local ML
+## Local ML Layout
 
-- Training CSVs should be placed in `Hospital_A/uploads/`.
-- The default sample training file is `Hospital_A/uploads/diabetes_sample.csv`.
-- Trained model checkpoints are saved to `Hospital_A/models/diabetes_classifier.pt`.
-- Main path and training settings live in `Hospital_A/config/client_config.yaml`.
+- Each hospital has its own config in `Hospital_X/config/client_config.yaml`.
+- Each hospital keeps its own local CSV dataset in `Hospital_X/uploads/`.
+- Each hospital saves its own model checkpoint in `Hospital_X/models/`.
+- Each hospital appends its own training and prediction logs in `Hospital_X/logs/`.
 - Shared reusable model, preprocessing, and config utilities live under `Shared_Assets/`.
+- The master sample dataset lives in `Datasets/original_dataset/diabetes_master_dataset.csv`.
+- Reference split files live in `Datasets/Hospital_A_split/`, `Datasets/Hospital_B_split/`, and `Datasets/Hospital_C_split/`.
 
 ## Local Commands
 
 - Train: `python FedLite_Project/Hospital_A/local_training/local_trainer.py`
-- Predict with default Hospital A sample: `python FedLite_Project/Hospital_A/prediction/predict_diabetes.py`
-- Predict with the test sample: `python FedLite_Project/Hospital_A/prediction/predict_diabetes.py --input FedLite_Project/Datasets/test_input_samples/diabetes_prediction_sample.csv`
+- Train: `python FedLite_Project/Hospital_B/local_training/local_trainer.py`
+- Train: `python FedLite_Project/Hospital_C/local_training/local_trainer.py`
+- Predict with Hospital A default data: `python FedLite_Project/Hospital_A/prediction/predict_diabetes.py`
+- Predict with Hospital B default data: `python FedLite_Project/Hospital_B/prediction/predict_diabetes.py`
+- Predict with Hospital C default data: `python FedLite_Project/Hospital_C/prediction/predict_diabetes.py`
+- Predict with a shared sample input: `python FedLite_Project/Hospital_A/prediction/predict_diabetes.py --input FedLite_Project/Datasets/test_input_samples/diabetes_prediction_sample.csv`

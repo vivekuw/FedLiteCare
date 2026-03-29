@@ -1,3 +1,6 @@
 # Hospital A Logs
 
-Placeholder directory for Hospital A client logs.
+Local runs append to:
+
+- `training.log`
+- `prediction.log`

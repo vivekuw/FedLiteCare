@@ -1,3 +1,3 @@
 # Hospital C Local Models
 
-Placeholder directory for Hospital C local model checkpoints.
+Current local training uses the sibling `models/` folder as the active checkpoint directory.

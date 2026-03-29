@@ -1,8 +1,11 @@
 hospital_name: Hospital_A
 uploads_dir: uploads
 models_dir: models
-dataset_filename: diabetes_sample.csv
-model_filename: diabetes_classifier.pt
+logs_dir: logs
+dataset_filename: hospital_a_diabetes.csv
+model_filename: hospital_a_diabetes_classifier.pt
+training_log_filename: training.log
+prediction_log_filename: prediction.log
 target_column: Outcome
 validation_ratio: 0.25
 batch_size: 4

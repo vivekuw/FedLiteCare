@@ -1,3 +1,3 @@
 # Hospital C Uploaded Data
 
-Placeholder directory for Hospital C training data files.
+Current local training uses the sibling `uploads/` folder as the active CSV input directory.

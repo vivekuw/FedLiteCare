@@ -1,3 +1,3 @@
 # Hospital C Dataset Split
 
-Placeholder location for Hospital C's local training subset.
+Reference split file for Hospital C: `hospital_c_diabetes.csv`

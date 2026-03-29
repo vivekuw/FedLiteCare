@@ -1,3 +1,3 @@
 # Hospital A Local Models
 
-Phase 2 uses the sibling `models/` folder as the active checkpoint directory.
+Current local training uses the sibling `models/` folder as the active checkpoint directory.

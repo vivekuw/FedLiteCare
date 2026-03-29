@@ -47,21 +47,25 @@ def main() -> None:
 
     if args.command == "train":
         result = train_local_model(config_path=args.config, dataset_filename=args.dataset)
+        print(f"Hospital: {result['hospital_name']}")
         print(f"Model saved to: {result['model_path']}")
         print(f"Validation accuracy: {result['validation_accuracy']:.4f}")
+        print(f"Training log updated: {result['log_path']}")
         return
 
     result = predict_from_csv(
-        input_path=args.input,
         config_path=args.config,
+        input_path=args.input,
         model_path=args.model,
     )
+    print(f"Hospital: {result['hospital_name']}")
     print(f"Scored file: {result['input_path']}")
     for row in result["predictions"]:
         print(
             f"Row {row['row']}: probability={row['probability']:.4f}, "
             f"predicted_label={row['predicted_label']}"
         )
+    print(f"Prediction log updated: {result['log_path']}")
 
 
 if __name__ == "__main__":

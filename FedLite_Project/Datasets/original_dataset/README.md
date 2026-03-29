@@ -1,3 +1,3 @@
 # Original Dataset
 
-Placeholder location for the source diabetes dataset before hospital-specific splitting.
+The master source sample for this demo is stored as `diabetes_master_dataset.csv`.
