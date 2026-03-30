@@ -7,6 +7,7 @@ version_history_filename: version_history.json
 round_state_filename: round_state.json
 aggregation_log_filename: aggregator.log
 round_log_filename: round_log.log
+node_log_filename: aggregator_runtime.log
 hospital_a_config_path: ../Hospital_A/config/client_config.yaml
 hospital_b_config_path: ../Hospital_B/config/client_config.yaml
 hospital_c_config_path: ../Hospital_C/config/client_config.yaml

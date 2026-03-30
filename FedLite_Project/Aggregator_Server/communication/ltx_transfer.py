@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -74,6 +75,27 @@ def _resolve_hospital_port(settings: dict[str, Any], hospital_name: str, port_ty
     return int(settings[hospital_ports[port_type]])
 
 
+def _send_with_retry(
+    send_callable: Any,
+    retry_attempts: int,
+    retry_delay_seconds: float,
+) -> dict[str, Any]:
+    last_error: Exception | None = None
+
+    for attempt in range(1, retry_attempts + 1):
+        try:
+            return send_callable()
+        except (ConnectionError, OSError, TimeoutError) as error:
+            last_error = error
+            if attempt == retry_attempts:
+                break
+            time.sleep(retry_delay_seconds)
+
+    raise RuntimeError(
+        f"LTX send failed after {retry_attempts} attempt(s): {last_error}"
+    ) from last_error
+
+
 def send_global_model_to_hospital(
     hospital_name: str,
     source_path: Path,
@@ -85,6 +107,8 @@ def send_global_model_to_hospital(
     resolved_source_path = _validate_model_transfer_path(source_path)
     target_host = str(settings.get("host", "127.0.0.1"))
     target_port = _resolve_hospital_port(settings, hospital_name, "global_model_port")
+    retry_attempts = int(settings.get("connect_retry_attempts", 1))
+    retry_delay_seconds = float(settings.get("connect_retry_delay_seconds", 1))
 
     log_transfer_event(
         paths["transfer_log_path"],
@@ -98,19 +122,23 @@ def send_global_model_to_hospital(
         },
     )
 
-    result = send_file_chunked(
-        source_path=resolved_source_path,
-        target_host=target_host,
-        target_port=target_port,
-        chunk_size=int(settings.get("chunk_size_bytes", 65536)),
-        socket_timeout_seconds=float(settings.get("socket_timeout_seconds", 30)),
-        metadata={
-            "transfer_type": "global_model",
-            "hospital_name": hospital_name,
-            "round_name": round_name,
-            "sender": "Aggregator_Server",
-            "receiver": hospital_name,
-        },
+    result = _send_with_retry(
+        send_callable=lambda: send_file_chunked(
+            source_path=resolved_source_path,
+            target_host=target_host,
+            target_port=target_port,
+            chunk_size=int(settings.get("chunk_size_bytes", 65536)),
+            socket_timeout_seconds=float(settings.get("socket_timeout_seconds", 30)),
+            metadata={
+                "transfer_type": "global_model",
+                "hospital_name": hospital_name,
+                "round_name": round_name,
+                "sender": "Aggregator_Server",
+                "receiver": hospital_name,
+            },
+        ),
+        retry_attempts=retry_attempts,
+        retry_delay_seconds=retry_delay_seconds,
     )
 
     log_transfer_event(

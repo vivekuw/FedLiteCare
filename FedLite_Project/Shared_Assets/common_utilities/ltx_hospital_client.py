@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -52,9 +53,30 @@ def load_hospital_transfer_context(
     }
 
 
+def _send_with_retry(
+    send_callable: Any,
+    retry_attempts: int,
+    retry_delay_seconds: float,
+) -> dict[str, Any]:
+    last_error: Exception | None = None
+
+    for attempt in range(1, retry_attempts + 1):
+        try:
+            return send_callable()
+        except (ConnectionError, OSError, TimeoutError) as error:
+            last_error = error
+            if attempt == retry_attempts:
+                break
+            time.sleep(retry_delay_seconds)
+
+    raise RuntimeError(
+        f"LTX send failed after {retry_attempts} attempt(s): {last_error}"
+    ) from last_error
+
+
 def receive_global_model_via_ltx(
     destination_path: Path,
-    round_name: str,
+    round_name: str | None,
     transfer_config_path: Path,
     ready_event: threading.Event | None = None,
 ) -> dict[str, Any]:
@@ -62,13 +84,14 @@ def receive_global_model_via_ltx(
     settings, paths = load_hospital_transfer_context(transfer_config_path)
     hospital_name = str(settings.get("hospital_name", paths["hospital_root"].name))
     resolved_destination_path = _validate_model_transfer_path(destination_path)
+    logged_round_name = round_name or "pending"
 
     log_transfer_event(
         paths["transfer_log_path"],
         title="Receiving global model via LTX",
         details={
             "hospital_name": hospital_name,
-            "round_name": round_name,
+            "round_name": logged_round_name,
             "bind_host": str(settings.get("host", "127.0.0.1")),
             "bind_port": int(settings["receive_port"]),
             "destination_path": resolved_destination_path,
@@ -83,13 +106,14 @@ def receive_global_model_via_ltx(
         socket_timeout_seconds=float(settings.get("socket_timeout_seconds", 30)),
         ready_event=ready_event,
     )
+    resolved_round_name = str(result["header"].get("round_name", logged_round_name))
 
     log_transfer_event(
         paths["transfer_log_path"],
         title="Global model received via LTX",
         details={
             "hospital_name": hospital_name,
-            "round_name": round_name,
+            "round_name": resolved_round_name,
             "sender_address": result["sender_address"],
             "sender_port": result["sender_port"],
             "received_bytes": result["bytes_received"],
@@ -112,6 +136,10 @@ def send_local_update_via_ltx(
     settings, paths = load_hospital_transfer_context(transfer_config_path)
     hospital_name = str(settings.get("hospital_name", paths["hospital_root"].name))
     resolved_source_path = _validate_model_transfer_path(source_path)
+    target_host = str(settings.get("aggregator_host", "127.0.0.1"))
+    target_port = int(settings["aggregator_receive_port"])
+    retry_attempts = int(settings.get("connect_retry_attempts", 1))
+    retry_delay_seconds = float(settings.get("connect_retry_delay_seconds", 1))
 
     log_transfer_event(
         paths["transfer_log_path"],
@@ -119,25 +147,29 @@ def send_local_update_via_ltx(
         details={
             "hospital_name": hospital_name,
             "round_name": round_name,
-            "target_host": str(settings.get("aggregator_host", "127.0.0.1")),
-            "target_port": int(settings["aggregator_receive_port"]),
+            "target_host": target_host,
+            "target_port": target_port,
             "source_path": resolved_source_path,
         },
     )
 
-    result = send_file_chunked(
-        source_path=resolved_source_path,
-        target_host=str(settings.get("aggregator_host", "127.0.0.1")),
-        target_port=int(settings["aggregator_receive_port"]),
-        chunk_size=int(settings.get("chunk_size_bytes", 65536)),
-        socket_timeout_seconds=float(settings.get("socket_timeout_seconds", 30)),
-        metadata={
-            "transfer_type": "local_update",
-            "hospital_name": hospital_name,
-            "round_name": round_name,
-            "sender": hospital_name,
-            "receiver": "Aggregator_Server",
-        },
+    result = _send_with_retry(
+        send_callable=lambda: send_file_chunked(
+            source_path=resolved_source_path,
+            target_host=target_host,
+            target_port=target_port,
+            chunk_size=int(settings.get("chunk_size_bytes", 65536)),
+            socket_timeout_seconds=float(settings.get("socket_timeout_seconds", 30)),
+            metadata={
+                "transfer_type": "local_update",
+                "hospital_name": hospital_name,
+                "round_name": round_name,
+                "sender": hospital_name,
+                "receiver": "Aggregator_Server",
+            },
+        ),
+        retry_attempts=retry_attempts,
+        retry_delay_seconds=retry_delay_seconds,
     )
 
     log_transfer_event(

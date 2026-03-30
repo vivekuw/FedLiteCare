@@ -4,5 +4,7 @@ receive_port: 9103
 aggregator_host: 127.0.0.1
 aggregator_receive_port: 9203
 chunk_size_bytes: 65536
-socket_timeout_seconds: 30
+socket_timeout_seconds: 300
+connect_retry_attempts: 120
+connect_retry_delay_seconds: 1
 transfer_log_filename: transfer.log

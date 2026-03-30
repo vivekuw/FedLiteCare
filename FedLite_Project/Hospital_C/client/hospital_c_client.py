@@ -14,9 +14,16 @@ from FedLite_Project.Hospital_C.local_training.local_trainer import (
     DEFAULT_CONFIG_PATH as TRAIN_CONFIG_PATH,
     train_local_model,
 )
+from FedLite_Project.Hospital_C.communication.ltx_transfer import (
+    receive_global_model_via_ltx,
+    send_local_update_via_ltx,
+)
 from FedLite_Project.Hospital_C.prediction.predict_diabetes import (
     DEFAULT_CONFIG_PATH as PREDICT_CONFIG_PATH,
     predict_from_csv,
+)
+from FedLite_Project.Shared_Assets.common_utilities.federated_hospital_node import (
+    run_hospital_federated_round,
 )
 
 
@@ -27,6 +34,23 @@ def main() -> None:
     train_parser = subparsers.add_parser("train", help="Train the local diabetes model.")
     train_parser.add_argument("--config", type=Path, default=TRAIN_CONFIG_PATH, help="Optional config path.")
     train_parser.add_argument(
+        "--dataset",
+        type=str,
+        default=None,
+        help="Optional CSV filename inside Hospital_C/uploads.",
+    )
+
+    federated_parser = subparsers.add_parser(
+        "federated-round",
+        help="Receive the global model, train locally, and send the update back.",
+    )
+    federated_parser.add_argument(
+        "--config",
+        type=Path,
+        default=TRAIN_CONFIG_PATH,
+        help="Optional config path.",
+    )
+    federated_parser.add_argument(
         "--dataset",
         type=str,
         default=None,
@@ -51,6 +75,24 @@ def main() -> None:
         print(f"Model saved to: {result['model_path']}")
         print(f"Validation accuracy: {result['validation_accuracy']:.4f}")
         print(f"Training log updated: {result['log_path']}")
+        return
+
+    if args.command == "federated-round":
+        result = run_hospital_federated_round(
+            config_path=args.config,
+            dataset_filename=args.dataset,
+            receive_global_model_callable=receive_global_model_via_ltx,
+            send_local_update_callable=send_local_update_via_ltx,
+            progress_callback=print,
+        )
+        print(f"Hospital: {result['hospital_name']}")
+        print(f"Completed round: {result['round_name']}")
+        print(f"Received global model: {result['received_global_model_path']}")
+        print(f"Local model saved to: {result['training_result']['model_path']}")
+        print(f"Local update sent from: {result['training_result']['local_update_path']}")
+        print(f"Validation accuracy: {result['training_result']['validation_accuracy']:.4f}")
+        print(f"Hospital runtime log updated: {result['runtime_log_path']}")
+        print(f"Transfer log updated: {result['transfer_log_path']}")
         return
 
     result = predict_from_csv(

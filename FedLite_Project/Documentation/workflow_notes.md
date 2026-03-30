@@ -46,3 +46,13 @@ Prediction CSV files can omit the `Outcome` column. If it is included, the predi
 9. The aggregator saves the new global checkpoint as both a round-specific version and the latest global model.
 10. The aggregator appends a simple human-readable round entry to `Aggregator_Server/logs/round_log.log`.
 11. Transfer events are appended to `Aggregator_Server/logs/transfer.log` and the matching hospital `logs/transfer.log`.
+
+## Four-Terminal Startup
+
+1. Start `Aggregator_Server/server/server_main.py --mode distributed`.
+2. Wait until the aggregator reports that its listeners are ready.
+3. Start `Hospital_A/client/hospital_a_client.py federated-round`.
+4. Start `Hospital_B/client/hospital_b_client.py federated-round`.
+5. Start `Hospital_C/client/hospital_c_client.py federated-round`.
+
+The root-level PowerShell helpers in `FedLite_Project/Start_Aggregator.ps1`, `FedLite_Project/Start_Hospital_A.ps1`, `FedLite_Project/Start_Hospital_B.ps1`, and `FedLite_Project/Start_Hospital_C.ps1` wrap those same commands.

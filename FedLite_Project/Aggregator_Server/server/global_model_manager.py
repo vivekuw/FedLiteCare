@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import json
 import sys
+import threading
 from datetime import datetime
 from pathlib import Path
+from queue import Queue
 from typing import Any, Callable
 
 import torch
@@ -91,10 +93,57 @@ HOSPITAL_LTX_HANDLERS = {
     },
 }
 
+HOSPITAL_ORDER = ["Hospital_A", "Hospital_B", "Hospital_C"]
+
 
 def _emit(progress_callback: Callable[[str], None] | None, message: str) -> None:
     if progress_callback is not None:
         progress_callback(message)
+
+
+def _start_background_task(
+    task_name: str,
+    task_callable: Callable[..., dict[str, Any]],
+    result_queue: Queue[tuple[str, str, Any]],
+    **task_kwargs: Any,
+) -> threading.Thread:
+    """Run a non-blocking task in a background thread and store the result."""
+
+    def _runner() -> None:
+        try:
+            result_queue.put(("ok", task_name, task_callable(**task_kwargs)))
+        except Exception as error:
+            result_queue.put(("error", task_name, error))
+
+    thread = threading.Thread(target=_runner, daemon=True)
+    thread.start()
+    return thread
+
+
+def _await_background_tasks(
+    threads: dict[str, threading.Thread],
+    result_queue: Queue[tuple[str, str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Collect results from background tasks and raise the first surfaced error."""
+    results: dict[str, dict[str, Any]] = {}
+
+    for _ in threads:
+        status, task_name, payload = result_queue.get()
+        if status != "ok":
+            raise payload
+        results[task_name] = payload
+
+    for thread in threads.values():
+        thread.join()
+
+    return results
+
+
+def _get_server_node_log_path(settings: dict[str, Any], paths: dict[str, Path]) -> Path:
+    return resolve_path(
+        paths["logs_dir"],
+        str(settings.get("node_log_filename", "aggregator_runtime.log")),
+    )
 
 
 def load_server_context(config_path: Path = DEFAULT_CONFIG_PATH) -> tuple[dict[str, Any], dict[str, Path]]:
@@ -377,26 +426,13 @@ def _load_received_checkpoint_payloads(
     return hospital_checkpoints
 
 
-def run_aggregation_round(
-    config_path: Path = DEFAULT_CONFIG_PATH,
-    hospital_model_overrides: dict[str, Path | None] | None = None,
-    round_number: int | None = None,
-    round_name: str | None = None,
+def _complete_aggregation_round(
+    settings: dict[str, Any],
+    paths: dict[str, Path],
+    received_updates: dict[str, dict[str, Any]],
+    resolved_round_number: int,
+    resolved_round_name: str,
 ) -> dict[str, Any]:
-    """Run one local federated aggregation pass from available hospital updates."""
-    settings, paths = load_server_context(config_path)
-    round_manager = RoundManager(
-        resolve_path(paths["aggregator_root"], str(settings["round_state_filename"]))
-    )
-    resolved_round_number = round_number or round_manager.next_round_number()
-    resolved_round_name = round_name or round_manager.format_round_name(resolved_round_number)
-
-    received_updates = receive_hospital_updates(
-        settings=settings,
-        paths=paths,
-        round_name=resolved_round_name,
-        overrides=hospital_model_overrides,
-    )
     aggregated_checkpoint = aggregate_hospital_checkpoints(
         _load_received_checkpoint_payloads(received_updates)
     )
@@ -429,6 +465,9 @@ def run_aggregation_round(
     )
     append_version_history(version_history_path, version_entry)
 
+    round_manager = RoundManager(
+        resolve_path(paths["aggregator_root"], str(settings["round_state_filename"]))
+    )
     round_summary = {
         "round_number": resolved_round_number,
         "round_name": resolved_round_name,
@@ -464,6 +503,219 @@ def run_aggregation_round(
         "version_history_path": version_history_path,
         "round_state_path": round_manager.state_path,
         "aggregation_log_path": aggregation_log_path,
+    }
+
+
+def run_aggregation_round(
+    config_path: Path = DEFAULT_CONFIG_PATH,
+    hospital_model_overrides: dict[str, Path | None] | None = None,
+    round_number: int | None = None,
+    round_name: str | None = None,
+) -> dict[str, Any]:
+    """Run one local federated aggregation pass from available hospital updates."""
+    settings, paths = load_server_context(config_path)
+    round_manager = RoundManager(resolve_path(paths["aggregator_root"], str(settings["round_state_filename"])))
+    resolved_round_number = round_number or round_manager.next_round_number()
+    resolved_round_name = round_name or round_manager.format_round_name(resolved_round_number)
+
+    received_updates = receive_hospital_updates(
+        settings=settings,
+        paths=paths,
+        round_name=resolved_round_name,
+        overrides=hospital_model_overrides,
+    )
+    return _complete_aggregation_round(
+        settings=settings,
+        paths=paths,
+        received_updates=received_updates,
+        resolved_round_number=resolved_round_number,
+        resolved_round_name=resolved_round_name,
+    )
+
+
+def run_distributed_federated_round(
+    config_path: Path = DEFAULT_CONFIG_PATH,
+    progress_callback: Callable[[str], None] | None = None,
+) -> dict[str, Any]:
+    """Run one aggregator-led round with hospitals in separate terminals."""
+    settings, paths = load_server_context(config_path)
+    hospital_config_paths = load_hospital_config_paths(settings, paths["aggregator_root"])
+    round_manager = RoundManager(
+        resolve_path(paths["aggregator_root"], str(settings["round_state_filename"]))
+    )
+    round_number = round_manager.next_round_number()
+    round_name = round_manager.format_round_name(round_number)
+    node_log_path = _get_server_node_log_path(settings, paths)
+
+    append_log_entry(
+        node_log_path,
+        title="Distributed aggregator round started",
+        details={
+            "round_number": round_number,
+            "round_name": round_name,
+        },
+    )
+
+    _emit(progress_callback, f"[1/6] Loading or creating the global model for {round_name}...")
+    global_model_info = ensure_current_global_model(settings, paths, hospital_config_paths)
+    current_global_model_path = Path(global_model_info["global_model_path"])
+    _emit(progress_callback, f"Aggregator using global model: {current_global_model_path}")
+
+    _emit(progress_callback, f"[2/6] Opening update listeners for Hospital_A, Hospital_B, and Hospital_C...")
+    round_received_dir = ensure_directory(paths["received_models_dir"] / round_name)
+    receiver_threads: dict[str, dict[str, Any]] = {}
+    for hospital_name in HOSPITAL_ORDER:
+        destination_path = round_received_dir / f"{hospital_name.lower()}_update.pt"
+        receiver_thread, result_queue = start_receiver_thread(
+            receive_local_update_from_hospital,
+            hospital_name=hospital_name,
+            destination_path=destination_path,
+            round_name=round_name,
+        )
+        receiver_threads[hospital_name] = {
+            "thread": receiver_thread,
+            "result_queue": result_queue,
+            "received_path": destination_path,
+        }
+    append_log_entry(
+        node_log_path,
+        title="Aggregator listeners opened",
+        details={
+            "round_name": round_name,
+            "received_round_dir": round_received_dir,
+        },
+    )
+    _emit(
+        progress_callback,
+        "Aggregator listeners are ready. Start Hospital_A, Hospital_B, and Hospital_C terminals now.",
+    )
+
+    _emit(progress_callback, f"[3/6] Sending the current global model to all hospital terminals via LTX...")
+    send_results_queue: Queue[tuple[str, str, Any]] = Queue(maxsize=len(HOSPITAL_ORDER))
+    sender_threads: dict[str, threading.Thread] = {}
+    expected_distributed_models: dict[str, Path] = {}
+    for hospital_name in HOSPITAL_ORDER:
+        expected_distributed_models[hospital_name] = get_hospital_round_transfer_paths(
+            hospital_config_paths[hospital_name],
+            round_name,
+        )["received_global_model_path"]
+        sender_threads[hospital_name] = _start_background_task(
+            task_name=hospital_name,
+            task_callable=send_global_model_to_hospital,
+            result_queue=send_results_queue,
+            hospital_name=hospital_name,
+            source_path=current_global_model_path,
+            round_name=round_name,
+        )
+    send_results = _await_background_tasks(sender_threads, send_results_queue)
+    for hospital_name in HOSPITAL_ORDER:
+        _emit(
+            progress_callback,
+            f"Aggregator sent {round_name} global model to {hospital_name}.",
+        )
+    append_log_entry(
+        node_log_path,
+        title="Global model distribution completed",
+        details={
+            "round_name": round_name,
+            "hospital_a_bytes_sent": send_results["Hospital_A"]["bytes_sent"],
+            "hospital_b_bytes_sent": send_results["Hospital_B"]["bytes_sent"],
+            "hospital_c_bytes_sent": send_results["Hospital_C"]["bytes_sent"],
+        },
+    )
+
+    _emit(progress_callback, f"[4/6] Waiting for all hospital updates to arrive...")
+    received_updates: dict[str, dict[str, Any]] = {}
+    for hospital_name in HOSPITAL_ORDER:
+        receiver_result = finish_receiver_thread(
+            receiver_threads[hospital_name]["thread"],
+            receiver_threads[hospital_name]["result_queue"],
+        )
+        received_updates[hospital_name] = {
+            "source_path": str(receiver_result["header"].get("file_name", "unknown_source.pt")),
+            "received_path": receiver_threads[hospital_name]["received_path"],
+            "bytes_sent": int(receiver_result["header"].get("file_size", 0)),
+            "bytes_received": receiver_result["bytes_received"],
+        }
+        _emit(
+            progress_callback,
+            f"{hospital_name} update received at {receiver_threads[hospital_name]['received_path']}",
+        )
+
+    manifest_path = round_received_dir / "received_manifest.json"
+    manifest_payload = {
+        "round_name": round_name,
+        "received_at": datetime.now().isoformat(timespec="seconds"),
+        "hospitals": {
+            hospital_name: {
+                "source_path": str(update_paths["source_path"]),
+                "received_path": str(update_paths["received_path"]),
+                "bytes_sent": update_paths["bytes_sent"],
+                "bytes_received": update_paths["bytes_received"],
+            }
+            for hospital_name, update_paths in received_updates.items()
+        },
+    }
+    manifest_path.write_text(json.dumps(manifest_payload, indent=2), encoding="utf-8")
+
+    _emit(progress_callback, f"[5/6] Performing federated averaging for {round_name}...")
+    aggregation_result = _complete_aggregation_round(
+        settings=settings,
+        paths=paths,
+        received_updates=received_updates,
+        resolved_round_number=round_number,
+        resolved_round_name=round_name,
+    )
+
+    round_log_path = resolve_path(
+        paths["logs_dir"],
+        str(settings.get("round_log_filename", "round_log.log")),
+    )
+    round_log_details: dict[str, Any] = {
+        "round_name": round_name,
+        "round_number": round_number,
+        "starting_global_model": current_global_model_path,
+        "new_global_model": aggregation_result["global_model_path"],
+        "latest_global_model": aggregation_result["latest_model_path"],
+    }
+    for hospital_name in HOSPITAL_ORDER:
+        round_log_details[f"{hospital_name.lower()}_distributed_model"] = expected_distributed_models[hospital_name]
+        round_log_details[f"{hospital_name.lower()}_received_update"] = received_updates[hospital_name]["received_path"]
+
+    append_log_entry(
+        round_log_path,
+        title="Distributed federated round completed",
+        details=round_log_details,
+    )
+    append_log_entry(
+        node_log_path,
+        title="Distributed aggregator round completed",
+        details={
+            "round_number": round_number,
+            "round_name": round_name,
+            "new_global_model": aggregation_result["global_model_path"],
+            "latest_global_model": aggregation_result["latest_model_path"],
+        },
+    )
+
+    _emit(progress_callback, f"[6/6] Saved new global model version for {round_name}.")
+    _emit(progress_callback, f"Versioned global model: {aggregation_result['global_model_path']}")
+    _emit(progress_callback, f"Latest global model: {aggregation_result['latest_model_path']}")
+
+    return {
+        "round_number": round_number,
+        "round_name": round_name,
+        "current_global_model_path": current_global_model_path,
+        "distributed_models": expected_distributed_models,
+        "send_results": send_results,
+        "received_updates": aggregation_result["received_updates"],
+        "global_model_path": aggregation_result["global_model_path"],
+        "latest_model_path": aggregation_result["latest_model_path"],
+        "version_history_path": aggregation_result["version_history_path"],
+        "round_state_path": aggregation_result["round_state_path"],
+        "aggregation_log_path": aggregation_result["aggregation_log_path"],
+        "round_log_path": round_log_path,
+        "node_log_path": node_log_path,
     }
 
 

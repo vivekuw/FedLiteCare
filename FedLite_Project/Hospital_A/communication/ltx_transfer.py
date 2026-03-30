@@ -15,7 +15,7 @@ DEFAULT_TRANSFER_CONFIG_PATH = Path(__file__).resolve().parent / "transfer_confi
 
 def receive_global_model_via_ltx(
     destination_path: Path,
-    round_name: str,
+    round_name: str | None = None,
     transfer_config_path: Path = DEFAULT_TRANSFER_CONFIG_PATH,
     ready_event: threading.Event | None = None,
 ) -> dict[str, object]:
