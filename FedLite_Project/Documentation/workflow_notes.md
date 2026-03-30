@@ -36,11 +36,13 @@ Prediction CSV files can omit the `Outcome` column. If it is included, the predi
 ## Full Local Federated Workflow
 
 1. The aggregator creates or loads the current global model.
-2. The current global model is copied into each hospital's `communication/received_global_models/` folder.
-3. Each hospital loads that copied global model and trains locally on its own CSV dataset.
+2. The aggregator sends the current global model to each hospital through LTX on `127.0.0.1`.
+3. Each hospital receives that global model inside its own `communication/received_global_models/` folder and trains locally on its own CSV dataset.
 4. Each hospital saves its own standalone local model in `models/`.
 5. Each hospital also saves a round-specific update checkpoint in `communication/local_model_updates/`.
-6. The aggregator copies those three update files into `Aggregator_Server/received_models/round_xxx/`.
-7. FedAvg combines the three local updates into a new global checkpoint.
-8. The aggregator saves the new global checkpoint as both a round-specific version and the latest global model.
-9. The aggregator appends a simple human-readable round entry to `Aggregator_Server/logs/round_log.log`.
+6. Each hospital sends its round-specific update checkpoint back to the aggregator through LTX.
+7. The aggregator stores those update files inside `Aggregator_Server/received_models/round_xxx/`.
+8. FedAvg combines the three local updates into a new global checkpoint.
+9. The aggregator saves the new global checkpoint as both a round-specific version and the latest global model.
+10. The aggregator appends a simple human-readable round entry to `Aggregator_Server/logs/round_log.log`.
+11. Transfer events are appended to `Aggregator_Server/logs/transfer.log` and the matching hospital `logs/transfer.log`.

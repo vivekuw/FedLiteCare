@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +14,10 @@ WORKSPACE_ROOT = Path(__file__).resolve().parents[3]
 if str(WORKSPACE_ROOT) not in sys.path:
     sys.path.insert(0, str(WORKSPACE_ROOT))
 
+from FedLite_Project.Aggregator_Server.communication.ltx_transfer import (
+    receive_local_update_from_hospital,
+    send_global_model_to_hospital,
+)
 from FedLite_Project.Aggregator_Server.aggregation.federated_averaging import (
     aggregate_hospital_checkpoints,
 )
@@ -27,11 +30,27 @@ from FedLite_Project.Aggregator_Server.server.model_version_saver import (
     save_global_model_versions,
 )
 from FedLite_Project.Aggregator_Server.server.round_manager import RoundManager
+from FedLite_Project.Hospital_A.communication.ltx_transfer import (
+    receive_global_model_via_ltx as receive_global_model_hospital_a,
+    send_local_update_via_ltx as send_local_update_hospital_a,
+)
+from FedLite_Project.Hospital_B.communication.ltx_transfer import (
+    receive_global_model_via_ltx as receive_global_model_hospital_b,
+    send_local_update_via_ltx as send_local_update_hospital_b,
+)
+from FedLite_Project.Hospital_C.communication.ltx_transfer import (
+    receive_global_model_via_ltx as receive_global_model_hospital_c,
+    send_local_update_via_ltx as send_local_update_hospital_c,
+)
 from FedLite_Project.Shared_Assets.common_utilities.common_utils import (
     append_log_entry,
     ensure_directory,
     load_simple_yaml_config,
     resolve_path,
+)
+from FedLite_Project.Shared_Assets.common_utilities.ltx_core import (
+    finish_receiver_thread,
+    start_receiver_thread,
 )
 from FedLite_Project.Shared_Assets.common_utilities.local_ml_pipeline import (
     get_hospital_round_transfer_paths,
@@ -55,6 +74,21 @@ HOSPITAL_CONFIG_KEYS = {
     "Hospital_A": "hospital_a_config_path",
     "Hospital_B": "hospital_b_config_path",
     "Hospital_C": "hospital_c_config_path",
+}
+
+HOSPITAL_LTX_HANDLERS = {
+    "Hospital_A": {
+        "receive_global_model": receive_global_model_hospital_a,
+        "send_local_update": send_local_update_hospital_a,
+    },
+    "Hospital_B": {
+        "receive_global_model": receive_global_model_hospital_b,
+        "send_local_update": send_local_update_hospital_b,
+    },
+    "Hospital_C": {
+        "receive_global_model": receive_global_model_hospital_c,
+        "send_local_update": send_local_update_hospital_c,
+    },
 }
 
 
@@ -237,12 +271,23 @@ def distribute_global_model_to_hospitals(
     global_model_path: Path,
     round_name: str,
 ) -> dict[str, Path]:
-    """Copy the current global model into each hospital's local communication folder."""
+    """Send the current global model to each hospital via localhost LTX."""
     distributed_paths: dict[str, Path] = {}
     for hospital_name, config_path in hospital_config_paths.items():
         transfer_paths = get_hospital_round_transfer_paths(config_path, round_name)
         ensure_directory(transfer_paths["received_global_model_path"].parent)
-        shutil.copy2(global_model_path, transfer_paths["received_global_model_path"])
+
+        receiver_thread, result_queue = start_receiver_thread(
+            HOSPITAL_LTX_HANDLERS[hospital_name]["receive_global_model"],
+            destination_path=transfer_paths["received_global_model_path"],
+            round_name=round_name,
+        )
+        send_global_model_to_hospital(
+            hospital_name=hospital_name,
+            source_path=global_model_path,
+            round_name=round_name,
+        )
+        finish_receiver_thread(receiver_thread, result_queue)
         distributed_paths[hospital_name] = transfer_paths["received_global_model_path"]
     return distributed_paths
 
@@ -270,12 +315,12 @@ def receive_hospital_updates(
     paths: dict[str, Path],
     round_name: str,
     overrides: dict[str, Path | None] | None = None,
-) -> dict[str, dict[str, Path]]:
-    """Copy local hospital checkpoints into the aggregator's received-model store."""
+) -> dict[str, dict[str, Any]]:
+    """Receive hospital checkpoints into the aggregator's received-model store via LTX."""
     source_paths = _resolve_hospital_sources(settings, paths["aggregator_root"], overrides)
     round_received_dir = ensure_directory(paths["received_models_dir"] / round_name)
 
-    received_updates: dict[str, dict[str, Path]] = {}
+    received_updates: dict[str, dict[str, Any]] = {}
     for hospital_name, source_path in source_paths.items():
         if not source_path.exists():
             raise FileNotFoundError(
@@ -283,10 +328,22 @@ def receive_hospital_updates(
             )
 
         destination_path = round_received_dir / f"{hospital_name.lower()}_update.pt"
-        shutil.copy2(source_path, destination_path)
+        receiver_thread, result_queue = start_receiver_thread(
+            receive_local_update_from_hospital,
+            hospital_name=hospital_name,
+            destination_path=destination_path,
+            round_name=round_name,
+        )
+        send_result = HOSPITAL_LTX_HANDLERS[hospital_name]["send_local_update"](
+            source_path=source_path,
+            round_name=round_name,
+        )
+        receive_result = finish_receiver_thread(receiver_thread, result_queue)
         received_updates[hospital_name] = {
             "source_path": source_path,
             "received_path": destination_path,
+            "bytes_sent": send_result["bytes_sent"],
+            "bytes_received": receive_result["bytes_received"],
         }
 
     manifest_path = round_received_dir / "received_manifest.json"
@@ -297,6 +354,8 @@ def receive_hospital_updates(
             hospital_name: {
                 "source_path": str(update_paths["source_path"]),
                 "received_path": str(update_paths["received_path"]),
+                "bytes_sent": update_paths["bytes_sent"],
+                "bytes_received": update_paths["bytes_received"],
             }
             for hospital_name, update_paths in received_updates.items()
         },
@@ -306,7 +365,7 @@ def receive_hospital_updates(
 
 
 def _load_received_checkpoint_payloads(
-    received_updates: dict[str, dict[str, Path]],
+    received_updates: dict[str, dict[str, Any]],
 ) -> dict[str, dict[str, Any]]:
     device = torch.device("cpu")
     hospital_checkpoints: dict[str, dict[str, Any]] = {}
@@ -429,14 +488,17 @@ def run_full_federated_round(
     else:
         _emit(progress_callback, f"Loaded existing global model: {current_global_model_path}")
 
-    _emit(progress_callback, f"[2/8] Distributing the global model to all hospitals for {round_name}...")
+    _emit(
+        progress_callback,
+        f"[2/8] Aggregator sending the global model to all hospitals via LTX on 127.0.0.1 for {round_name}...",
+    )
     distributed_models = distribute_global_model_to_hospitals(
         hospital_config_paths=hospital_config_paths,
         global_model_path=current_global_model_path,
         round_name=round_name,
     )
     for hospital_name, distributed_path in distributed_models.items():
-        _emit(progress_callback, f"{hospital_name} received global model copy: {distributed_path}")
+        _emit(progress_callback, f"{hospital_name} received global model via LTX at: {distributed_path}")
 
     hospital_order = ["Hospital_A", "Hospital_B", "Hospital_C"]
     step_labels = {
@@ -468,19 +530,24 @@ def run_full_federated_round(
             ),
         )
 
-    _emit(progress_callback, f"[6/8] Aggregator collecting hospital model updates for {round_name}...")
+    _emit(progress_callback, f"[6/8] Aggregator collecting hospital model updates via LTX for {round_name}...")
     update_overrides = {
         hospital_name: Path(training_results[hospital_name]["local_update_path"])
         for hospital_name in hospital_order
     }
 
-    _emit(progress_callback, f"[7/8] Performing federated averaging for {round_name}...")
+    _emit(progress_callback, f"[7/8] Aggregator receiving local updates via LTX and performing FedAvg for {round_name}...")
     aggregation_result = run_aggregation_round(
         config_path=config_path,
         hospital_model_overrides=update_overrides,
         round_number=round_number,
         round_name=round_name,
     )
+    for hospital_name, update_paths in aggregation_result["received_updates"].items():
+        _emit(
+            progress_callback,
+            f"{hospital_name} local update received via LTX at: {update_paths['received_path']}",
+        )
 
     _emit(progress_callback, f"[8/8] Saving the new global model version for {round_name}...")
     _emit(progress_callback, f"New versioned global model: {aggregation_result['global_model_path']}")

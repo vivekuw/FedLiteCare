@@ -1,0 +1,10 @@
+host: 127.0.0.1
+chunk_size_bytes: 65536
+socket_timeout_seconds: 30
+transfer_log_filename: transfer.log
+hospital_a_receive_port: 9101
+hospital_b_receive_port: 9102
+hospital_c_receive_port: 9103
+hospital_a_update_receive_port: 9201
+hospital_b_update_receive_port: 9202
+hospital_c_update_receive_port: 9203

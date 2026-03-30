@@ -27,6 +27,7 @@ def main() -> None:
     args = parser.parse_args()
 
     print("FedLiteCare Local Federated Learning Simulation")
+    print("LTX Transfer Backbone on 127.0.0.1")
     print("------------------------------------------------")
     result = run_full_federated_round(config_path=args.config, progress_callback=print)
     print("------------------------------------------------")
