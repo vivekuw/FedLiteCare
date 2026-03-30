@@ -55,8 +55,11 @@ The recommended 4-terminal demo flow is documented in `RUN_GUIDE.md`.
 - Launch Hospital A GUI: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Launch_Hospital_A_GUI.ps1`
 - Launch Hospital B GUI: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Launch_Hospital_B_GUI.ps1`
 - Launch Hospital C GUI: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Launch_Hospital_C_GUI.ps1`
+- Hospital A packaging-ready GUI entry point: `python FedLite_Project/Hospital_A/hospital_a_app.py`
 
 The Tkinter hospital client includes dashboard, dataset upload, local training, single-patient prediction, aggregator sync, and log/status tabs while reusing the existing backend modules.
+
+Windows EXE preparation notes for the Hospital A client are documented in `WINDOWS_EXE_PACKAGING.md`.
 
 ## Practical Hospital Utilities
 
