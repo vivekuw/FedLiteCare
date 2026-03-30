@@ -56,3 +56,20 @@ Prediction CSV files can omit the `Outcome` column. If it is included, the predi
 5. Start `Hospital_C/client/hospital_c_client.py federated-round`.
 
 The root-level PowerShell helpers in `FedLite_Project/Start_Aggregator.ps1`, `FedLite_Project/Start_Hospital_A.ps1`, `FedLite_Project/Start_Hospital_B.ps1`, and `FedLite_Project/Start_Hospital_C.ps1` wrap those same commands.
+
+## Desktop GUI
+
+The hospital desktop client can be launched with:
+
+- `FedLite_Project/Launch_Hospital_A_GUI.ps1`
+- `FedLite_Project/Launch_Hospital_B_GUI.ps1`
+- `FedLite_Project/Launch_Hospital_C_GUI.ps1`
+
+The GUI is a thin Tkinter layer over the existing backend. It reuses local training, prediction, and sync modules rather than replacing them.
+
+## Validation And Reports
+
+1. Before any local training run, the dataset is validated for required columns, missing values, and obvious bad rows.
+2. A readable validation report is saved in `Hospital_X/reports/validation/`.
+3. Each single-patient prediction generates a readable report in `Hospital_X/reports/predictions/`.
+4. Training, prediction, and sync activity continue to append to the hospital log files in `Hospital_X/logs/`.

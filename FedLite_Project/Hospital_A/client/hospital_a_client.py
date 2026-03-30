@@ -25,6 +25,9 @@ from FedLite_Project.Hospital_A.prediction.predict_diabetes import (
 from FedLite_Project.Shared_Assets.common_utilities.federated_hospital_node import (
     run_hospital_federated_round,
 )
+from FedLite_Project.Shared_Assets.common_utilities.hospital_quality_reports import (
+    validate_training_dataset,
+)
 
 
 def main() -> None:
@@ -57,6 +60,20 @@ def main() -> None:
         help="Optional CSV filename inside Hospital_A/uploads.",
     )
 
+    validate_parser = subparsers.add_parser("validate-dataset", help="Validate a training CSV before model training.")
+    validate_parser.add_argument(
+        "--config",
+        type=Path,
+        default=TRAIN_CONFIG_PATH,
+        help="Optional config path.",
+    )
+    validate_parser.add_argument(
+        "--dataset",
+        type=str,
+        default=None,
+        help="Optional CSV filename inside Hospital_A/uploads.",
+    )
+
     predict_parser = subparsers.add_parser("predict", help="Run predictions from a CSV file.")
     predict_parser.add_argument(
         "--config",
@@ -72,6 +89,8 @@ def main() -> None:
     if args.command == "train":
         result = train_local_model(config_path=args.config, dataset_filename=args.dataset)
         print(f"Hospital: {result['hospital_name']}")
+        print(f"Validation status: {result['validation_result']['status']}")
+        print(f"Validation report: {result['validation_report_path']}")
         print(f"Model saved to: {result['model_path']}")
         print(f"Validation accuracy: {result['validation_accuracy']:.4f}")
         print(f"Training log updated: {result['log_path']}")
@@ -88,11 +107,21 @@ def main() -> None:
         print(f"Hospital: {result['hospital_name']}")
         print(f"Completed round: {result['round_name']}")
         print(f"Received global model: {result['received_global_model_path']}")
+        print(f"Validation status: {result['training_result']['validation_result']['status']}")
+        print(f"Validation report: {result['training_result']['validation_report_path']}")
         print(f"Local model saved to: {result['training_result']['model_path']}")
         print(f"Local update sent from: {result['training_result']['local_update_path']}")
         print(f"Validation accuracy: {result['training_result']['validation_accuracy']:.4f}")
         print(f"Hospital runtime log updated: {result['runtime_log_path']}")
         print(f"Transfer log updated: {result['transfer_log_path']}")
+        return
+
+    if args.command == "validate-dataset":
+        result = validate_training_dataset(config_path=args.config, dataset_filename=args.dataset)
+        print(f"Hospital: {result['hospital_name']}")
+        print(f"Dataset path: {result['dataset_path']}")
+        print(f"Validation status: {result['status']}")
+        print(f"Validation report: {result['report_path']}")
         return
 
     result = predict_from_csv(

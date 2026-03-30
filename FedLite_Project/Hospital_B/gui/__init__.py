@@ -1,0 +1,1 @@
+"""Hospital B GUI package."""

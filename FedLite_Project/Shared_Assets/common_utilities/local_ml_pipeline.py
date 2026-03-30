@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 import shutil
 from typing import Any
@@ -14,6 +15,10 @@ from FedLite_Project.Shared_Assets.common_utilities.common_utils import (
     ensure_directory,
     load_simple_yaml_config,
     resolve_path,
+)
+from FedLite_Project.Shared_Assets.common_utilities.hospital_quality_reports import (
+    create_prediction_report,
+    validate_training_dataset,
 )
 from FedLite_Project.Shared_Assets.data_preprocessing_helpers.preprocessing_utils import (
     fit_preprocessor,
@@ -59,6 +64,24 @@ def load_hospital_context(config_path: Path) -> tuple[dict[str, Any], dict[str, 
             str(settings.get("local_updates_dir", "communication/local_model_updates")),
         )
     )
+    reports_dir = ensure_directory(
+        resolve_path(
+            hospital_root,
+            str(settings.get("reports_dir", "reports")),
+        )
+    )
+    validation_reports_dir = ensure_directory(
+        resolve_path(
+            hospital_root,
+            str(settings.get("validation_reports_dir", "reports/validation")),
+        )
+    )
+    prediction_reports_dir = ensure_directory(
+        resolve_path(
+            hospital_root,
+            str(settings.get("prediction_reports_dir", "reports/predictions")),
+        )
+    )
 
     return settings, {
         "config_path": resolved_config_path,
@@ -68,6 +91,9 @@ def load_hospital_context(config_path: Path) -> tuple[dict[str, Any], dict[str, 
         "logs_dir": logs_dir,
         "received_global_models_dir": received_global_models_dir,
         "local_updates_dir": local_updates_dir,
+        "reports_dir": reports_dir,
+        "validation_reports_dir": validation_reports_dir,
+        "prediction_reports_dir": prediction_reports_dir,
     }
 
 
@@ -125,62 +151,121 @@ def train_local_model(
             "local_update_path"
         ]
 
-    records = load_csv_records(dataset_path)
-    features, labels, preprocessing = fit_preprocessor(
-        records,
-        target_column=str(settings.get("target_column", "Outcome")),
+    validation_result = validate_training_dataset(
+        config_path=config_path,
+        dataset_filename=dataset_name,
     )
-    train_dataset, validation_dataset = split_tensor_dataset(
-        features,
-        labels,
-        validation_ratio=float(settings.get("validation_ratio", 0.25)),
-        seed=seed,
-    )
-
-    batch_size = int(settings.get("batch_size", 8))
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=False)
-
-    model = DiabetesClassifier(
-        input_dim=features.shape[1],
-        hidden_dim=int(settings.get("hidden_dim", 16)),
-    )
-    if resolved_initial_model_path is not None:
-        _, base_checkpoint = load_checkpoint(resolved_initial_model_path, torch.device("cpu"))
-        model.load_state_dict(base_checkpoint["model_state_dict"])
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    trained_model, history, validation_metrics = train_classifier(
-        model=model,
-        train_loader=train_loader,
-        validation_loader=validation_loader,
-        epochs=int(settings.get("epochs", 80)),
-        learning_rate=float(settings.get("learning_rate", 0.001)),
-        device=device,
-    )
-
-    save_checkpoint(
-        checkpoint_path=model_path,
-        model=trained_model,
-        preprocessing=preprocessing,
-        model_config={
-            "input_dim": features.shape[1],
-            "hidden_dim": int(settings.get("hidden_dim", 16)),
+    append_log_entry(
+        training_log_path,
+        title="Dataset validation completed",
+        details={
+            "hospital_name": hospital_name,
+            "dataset_path": dataset_path,
+            "validation_status": validation_result["status"],
+            "validation_report_path": validation_result["report_path"],
+            "missing_columns": ", ".join(validation_result["missing_columns"]) or "None",
+            "invalid_row_count": len(validation_result["invalid_rows"]),
+            "suspicious_row_count": len(validation_result["suspicious_rows"]),
+            "rows_with_missing_features": validation_result["rows_with_missing_features"],
         },
-        training_metrics=validation_metrics,
-        history=history,
     )
-    if resolved_local_update_path is not None:
-        ensure_directory(resolved_local_update_path.parent)
-        shutil.copy2(model_path, resolved_local_update_path)
+    if not validation_result["is_valid"]:
+        append_log_entry(
+            training_log_path,
+            title="Training blocked by dataset validation",
+            details={
+                "hospital_name": hospital_name,
+                "dataset_path": dataset_path,
+                "validation_status": validation_result["status"],
+                "validation_report_path": validation_result["report_path"],
+                "status": "failed",
+            },
+        )
+        raise ValueError(
+            f"Dataset validation failed for {hospital_name}. See report: {validation_result['report_path']}"
+        )
+
+    try:
+        records = load_csv_records(dataset_path)
+        features, labels, preprocessing = fit_preprocessor(
+            records,
+            target_column=str(settings.get("target_column", "Outcome")),
+        )
+        train_dataset, validation_dataset = split_tensor_dataset(
+            features,
+            labels,
+            validation_ratio=float(settings.get("validation_ratio", 0.25)),
+            seed=seed,
+        )
+
+        batch_size = int(settings.get("batch_size", 8))
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=False)
+
+        model = DiabetesClassifier(
+            input_dim=features.shape[1],
+            hidden_dim=int(settings.get("hidden_dim", 16)),
+        )
+        if resolved_initial_model_path is not None:
+            _, base_checkpoint = load_checkpoint(resolved_initial_model_path, torch.device("cpu"))
+            model.load_state_dict(base_checkpoint["model_state_dict"])
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        trained_model, history, validation_metrics = train_classifier(
+            model=model,
+            train_loader=train_loader,
+            validation_loader=validation_loader,
+            epochs=int(settings.get("epochs", 80)),
+            learning_rate=float(settings.get("learning_rate", 0.001)),
+            device=device,
+        )
+
+        save_checkpoint(
+            checkpoint_path=model_path,
+            model=trained_model,
+            preprocessing=preprocessing,
+            model_config={
+                "input_dim": features.shape[1],
+                "hidden_dim": int(settings.get("hidden_dim", 16)),
+            },
+            training_metrics=validation_metrics,
+            history=history,
+            metadata={
+                "hospital_name": hospital_name,
+                "round_name": round_name or "standalone",
+                "saved_at": datetime.now().isoformat(timespec="seconds"),
+                "dataset_filename": dataset_name,
+            },
+        )
+        if resolved_local_update_path is not None:
+            ensure_directory(resolved_local_update_path.parent)
+            shutil.copy2(model_path, resolved_local_update_path)
+    except Exception as error:
+        append_log_entry(
+            training_log_path,
+            title="Training failed",
+            details={
+                "hospital_name": hospital_name,
+                "round_name": round_name or "standalone",
+                "status": "failed",
+                "dataset_path": dataset_path,
+                "validation_status": validation_result["status"],
+                "validation_report_path": validation_result["report_path"],
+                "error": str(error),
+            },
+        )
+        raise
 
     append_log_entry(
         training_log_path,
-        title="Training run",
+        title="Training completed",
         details={
             "hospital_name": hospital_name,
             "round_name": round_name or "standalone",
+            "status": "completed",
             "dataset_path": dataset_path,
+            "validation_status": validation_result["status"],
+            "validation_report_path": validation_result["report_path"],
             "initial_model_path": "None" if resolved_initial_model_path is None else resolved_initial_model_path,
             "model_path": model_path,
             "local_update_path": "None" if resolved_local_update_path is None else resolved_local_update_path,
@@ -205,6 +290,8 @@ def train_local_model(
         "validation_rows": len(validation_dataset),
         "validation_loss": validation_metrics["loss"],
         "validation_accuracy": validation_metrics["accuracy"],
+        "validation_result": validation_result,
+        "validation_report_path": validation_result["report_path"],
     }
 
 
@@ -262,6 +349,7 @@ def predict_from_csv(
             "rows_scored": len(prediction_rows),
             "positive_predictions": sum(row["predicted_label"] for row in prediction_rows),
             "accuracy": "N/A" if accuracy is None else round(accuracy, 6),
+            "status": "completed",
         },
     )
 
@@ -272,4 +360,78 @@ def predict_from_csv(
         "log_path": prediction_log_path,
         "predictions": prediction_rows,
         "accuracy": accuracy,
+    }
+
+
+def predict_from_patient_values(
+    config_path: Path,
+    patient_values: dict[str, str | float],
+    model_path: Path | None = None,
+) -> dict[str, Any]:
+    """Generate a diabetes prediction for one patient record from in-memory field values."""
+    settings, paths = load_hospital_context(config_path)
+    hospital_name = str(settings.get("hospital_name", paths["hospital_root"].name))
+    default_model_path = resolve_path(paths["models_dir"], str(settings["model_filename"]))
+    resolved_model_path = _resolve_optional_cli_path(model_path, default_model_path)
+    prediction_log_path = resolve_path(
+        paths["logs_dir"],
+        str(settings.get("prediction_log_filename", "prediction.log")),
+    )
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model, checkpoint = load_checkpoint(resolved_model_path, device)
+    feature_columns = list(checkpoint["preprocessing"]["feature_columns"])
+    record = {
+        column: str(patient_values.get(column, "")).strip()
+        for column in feature_columns
+    }
+
+    features, _ = transform_records([record], checkpoint["preprocessing"])
+    probability = float(predict_probabilities(model, features, device).view(-1)[0].item())
+    predicted_label = int(probability >= 0.5)
+
+    append_log_entry(
+        prediction_log_path,
+        title="Single-patient prediction",
+        details={
+            "hospital_name": hospital_name,
+            "model_path": resolved_model_path,
+            "probability": round(probability, 6),
+            "predicted_label": predicted_label,
+            "status": "completed",
+        },
+    )
+    result_label = "High diabetes risk" if predicted_label == 1 else "Lower diabetes risk"
+    confidence_score = probability if predicted_label == 1 else 1.0 - probability
+    report_path = create_prediction_report(
+        config_path=config_path,
+        patient_values=record,
+        prediction_result={
+            "model_path": resolved_model_path,
+            "predicted_label": predicted_label,
+            "result_label": result_label,
+            "confidence_score": confidence_score,
+        },
+    )
+    append_log_entry(
+        prediction_log_path,
+        title="Prediction report generated",
+        details={
+            "hospital_name": hospital_name,
+            "report_path": report_path,
+            "result_label": result_label,
+            "confidence_score": round(confidence_score, 6),
+        },
+    )
+
+    return {
+        "hospital_name": hospital_name,
+        "model_path": resolved_model_path,
+        "log_path": prediction_log_path,
+        "feature_columns": feature_columns,
+        "probability": probability,
+        "predicted_label": predicted_label,
+        "confidence_score": confidence_score,
+        "result_label": result_label,
+        "report_path": report_path,
     }

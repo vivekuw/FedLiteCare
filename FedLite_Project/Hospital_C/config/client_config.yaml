@@ -4,6 +4,9 @@ models_dir: models
 logs_dir: logs
 received_global_models_dir: communication/received_global_models
 local_updates_dir: communication/local_model_updates
+reports_dir: reports
+validation_reports_dir: reports/validation
+prediction_reports_dir: reports/predictions
 dataset_filename: hospital_c_diabetes.csv
 model_filename: hospital_c_diabetes_classifier.pt
 training_log_filename: training.log

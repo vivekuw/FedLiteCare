@@ -49,3 +49,18 @@ The recommended 4-terminal demo flow is documented in `RUN_GUIDE.md`.
 - Predict with a shared sample input: `python FedLite_Project/Hospital_A/prediction/predict_diabetes.py --input FedLite_Project/Datasets/test_input_samples/diabetes_prediction_sample.csv`
 - Run one 4-terminal federated round from the aggregator: `python FedLite_Project/Aggregator_Server/server/server_main.py --mode distributed`
 - Run the old one-terminal fallback flow: `python FedLite_Project/Aggregator_Server/server/server_main.py --mode single-process`
+
+## Desktop GUI
+
+- Launch Hospital A GUI: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Launch_Hospital_A_GUI.ps1`
+- Launch Hospital B GUI: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Launch_Hospital_B_GUI.ps1`
+- Launch Hospital C GUI: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Launch_Hospital_C_GUI.ps1`
+
+The Tkinter hospital client includes dashboard, dataset upload, local training, single-patient prediction, aggregator sync, and log/status tabs while reusing the existing backend modules.
+
+## Practical Hospital Utilities
+
+- Dataset validation runs before training and saves readable reports in `Hospital_X/reports/validation/`.
+- Single-patient predictions create readable reports in `Hospital_X/reports/predictions/`.
+- Hospital client commands also support manual validation with `validate-dataset`.
+- Training, sync, and prediction logs remain under each hospital's `logs/` folder for demo-friendly screenshots.

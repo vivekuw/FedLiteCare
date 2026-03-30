@@ -134,6 +134,7 @@ def save_checkpoint(
     model_config: dict[str, Any],
     training_metrics: dict[str, float],
     history: list[dict[str, float]],
+    metadata: dict[str, Any] | None = None,
 ) -> None:
     """Save the trained model and preprocessing metadata for later inference."""
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
@@ -144,6 +145,7 @@ def save_checkpoint(
             "preprocessing": preprocessing,
             "training_metrics": training_metrics,
             "history": history,
+            "metadata": metadata or {},
         },
         checkpoint_path,
     )
