@@ -26,9 +26,14 @@ class AggregatorDashboardApp(tk.Tk):
 
     LOG_NAMES = ("runtime", "aggregation", "round")
 
-    def __init__(self, config_path: Path = DEFAULT_CONFIG_PATH) -> None:
+    def __init__(
+        self,
+        config_path: Path = DEFAULT_CONFIG_PATH,
+        authenticated_username: str | None = None,
+    ) -> None:
         super().__init__()
         self.config_path = config_path.resolve()
+        self.authenticated_username = authenticated_username or "Operator"
         self.dashboard_status = get_aggregator_dashboard_status(self.config_path)
         self.background_events: Queue[tuple[str, str, Any]] = Queue()
         self.busy_widgets: list[ttk.Widget] = []
@@ -40,6 +45,7 @@ class AggregatorDashboardApp(tk.Tk):
 
         self.current_status_var = tk.StringVar(value="Aggregator ready")
         self.server_name_var = tk.StringVar(value=self.dashboard_status["server_name"])
+        self.operator_var = tk.StringVar(value=self.authenticated_username)
         self.latest_round_var = tk.StringVar(value=self._format_round(self.dashboard_status["latest_completed_round"]))
         self.next_round_var = tk.StringVar(value=self._format_round(self.dashboard_status["next_round_number"]))
         self.latest_round_name_var = tk.StringVar(value=self.dashboard_status["latest_round_name"] or "round_000")
@@ -137,11 +143,12 @@ class AggregatorDashboardApp(tk.Tk):
         first_row = ttk.Frame(self.overview_tab)
         first_row.pack(fill="x")
         self._build_value_card(first_row, "Server Name", self.server_name_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
-        self._build_value_card(first_row, "Latest Completed Round", self.latest_round_var).pack(side="left", fill="x", expand=True, padx=8)
+        self._build_value_card(first_row, "Signed In User", self.operator_var).pack(side="left", fill="x", expand=True, padx=8)
         self._build_value_card(first_row, "Next Round", self.next_round_var).pack(side="left", fill="x", expand=True, padx=(8, 0))
 
         second_row = ttk.Frame(self.overview_tab)
         second_row.pack(fill="x", pady=(12, 0))
+        self._build_value_card(second_row, "Latest Completed Round", self.latest_round_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
         self._build_value_card(second_row, "Latest Round Name", self.latest_round_name_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
         self._build_value_card(second_row, "Latest Global Model", self.global_model_var).pack(side="left", fill="x", expand=True, padx=8)
         self._build_value_card(second_row, "Global Model Size", self.global_model_size_var).pack(side="left", fill="x", expand=True, padx=(8, 0))
@@ -392,7 +399,13 @@ class AggregatorDashboardApp(tk.Tk):
         return "N/A" if path_value is None else path_value.name
 
 
-def launch_aggregator_dashboard(config_path: Path = DEFAULT_CONFIG_PATH) -> None:
+def launch_aggregator_dashboard(
+    config_path: Path = DEFAULT_CONFIG_PATH,
+    authenticated_username: str | None = None,
+) -> None:
     """Launch the Tkinter aggregator dashboard."""
-    app = AggregatorDashboardApp(config_path=config_path)
+    app = AggregatorDashboardApp(
+        config_path=config_path,
+        authenticated_username=authenticated_username,
+    )
     app.mainloop()

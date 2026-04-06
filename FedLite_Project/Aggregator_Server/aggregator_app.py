@@ -26,6 +26,9 @@ from FedLite_Project.Aggregator_Server.gui.tkinter_aggregator_dashboard import (
 from FedLite_Project.Aggregator_Server.server.global_model_manager import (  # noqa: E402
     DEFAULT_CONFIG_PATH,
 )
+from FedLite_Project.Shared_Assets.common_utilities.node_login import (  # noqa: E402
+    request_node_login,
+)
 
 
 def main() -> None:
@@ -39,7 +42,14 @@ def main() -> None:
         help="Optional aggregator server config path.",
     )
     args = parser.parse_args()
-    launch_aggregator_dashboard(config_path=args.config.resolve())
+    config_path = args.config.resolve()
+    authenticated_username = request_node_login(config_path)
+    if authenticated_username is None:
+        return
+    launch_aggregator_dashboard(
+        config_path=config_path,
+        authenticated_username=authenticated_username,
+    )
 
 
 if __name__ == "__main__":
