@@ -16,6 +16,11 @@ training_log_filename: training.log
 prediction_log_filename: prediction.log
 federated_log_filename: federated_client.log
 current_global_model_filename: current_global_model.pt
+login_enabled: true
+login_username: node_b
+login_password: nodeb123
+login_window_title: Hospital_B Node Login
+login_subtitle: Sign in to open the Hospital_B constrained-node client.
 target_column: Outcome
 validation_ratio: 0.25
 batch_size: 4

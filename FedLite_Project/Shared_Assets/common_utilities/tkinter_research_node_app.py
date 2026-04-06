@@ -27,6 +27,7 @@ from FedLite_Project.Shared_Assets.common_utilities.local_ml_pipeline import (
     predict_from_patient_values,
     train_local_model,
 )
+from FedLite_Project.Shared_Assets.common_utilities.node_login import request_node_login
 from FedLite_Project.Shared_Assets.data_preprocessing_helpers.preprocessing_utils import load_csv_records
 
 
@@ -45,11 +46,13 @@ class ResearchNodeApp(tk.Tk):
         config_path: Path,
         receive_global_model_callable: Callable[..., dict[str, Any]],
         send_local_update_callable: Callable[..., dict[str, Any]],
+        authenticated_username: str | None = None,
     ) -> None:
         super().__init__()
         self.config_path = config_path.resolve()
         self.receive_global_model_callable = receive_global_model_callable
         self.send_local_update_callable = send_local_update_callable
+        self.authenticated_username = authenticated_username or "Operator"
         self.node_status = get_research_node_status(self.config_path)
         self.feature_columns = get_feature_columns_for_hospital(self.config_path)
         self.example_patient_values = get_example_patient_values_for_hospital(self.config_path)
@@ -67,6 +70,7 @@ class ResearchNodeApp(tk.Tk):
         self.dataset_var = tk.StringVar(value=self.node_status["active_dataset"])
         self.node_label_var = tk.StringVar(value=self.node_status["node_label"])
         self.hospital_id_var = tk.StringVar(value=self.node_status["hospital_name"])
+        self.operator_var = tk.StringVar(value=self.authenticated_username)
         self.dataset_path_var = tk.StringVar(value=str(self.node_status["dataset_path"]))
         self.dataset_rows_var = tk.StringVar(value=self._format_count(self.node_status["dataset_row_count"]))
         self.dataset_file_count_var = tk.StringVar(value=str(self.node_status["dataset_file_count"]))
@@ -190,13 +194,19 @@ class ResearchNodeApp(tk.Tk):
         row_one.pack(fill="x", pady=(16, 0))
         self._build_value_card(row_one, "Node Label", self.node_label_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
         self._build_value_card(row_one, "Source ID", self.hospital_id_var).pack(side="left", fill="x", expand=True, padx=8)
-        self._build_value_card(row_one, "Selected Dataset", self.dataset_var).pack(side="left", fill="x", expand=True, padx=(8, 0))
+        self._build_value_card(row_one, "Signed In User", self.operator_var).pack(side="left", fill="x", expand=True, padx=(8, 0))
+
+        row_dataset = ttk.Frame(self.overview_tab)
+        row_dataset.pack(fill="x", pady=(12, 0))
+        self._build_value_card(row_dataset, "Selected Dataset", self.dataset_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
+        self._build_value_card(row_dataset, "Local Model Version", self.local_model_version_var).pack(side="left", fill="x", expand=True, padx=8)
+        self._build_value_card(row_dataset, "Global Model Version", self.global_model_version_var).pack(side="left", fill="x", expand=True, padx=(8, 0))
 
         row_two = ttk.Frame(self.overview_tab)
         row_two.pack(fill="x", pady=(12, 0))
-        self._build_value_card(row_two, "Local Model Version", self.local_model_version_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
-        self._build_value_card(row_two, "Global Model Version", self.global_model_version_var).pack(side="left", fill="x", expand=True, padx=8)
         self._build_value_card(row_two, "Dataset Rows", self.dataset_rows_var).pack(side="left", fill="x", expand=True, padx=(8, 0))
+        self._build_value_card(row_two, "Validation Status", self.validation_status_var).pack(side="left", fill="x", expand=True, padx=8)
+        self._build_value_card(row_two, "Sync Status", self.sync_status_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
 
         row_three = ttk.Frame(self.overview_tab)
         row_three.pack(fill="x", pady=(12, 0))
@@ -753,9 +763,14 @@ def launch_hospital_gui(
     send_local_update_callable: Callable[..., dict[str, Any]],
 ) -> None:
     """Launch the simplified research-demo node GUI."""
+    authenticated_username = request_node_login(config_path)
+    if authenticated_username is None:
+        return
+
     app = ResearchNodeApp(
         config_path=config_path,
         receive_global_model_callable=receive_global_model_callable,
         send_local_update_callable=send_local_update_callable,
+        authenticated_username=authenticated_username,
     )
     app.mainloop()
