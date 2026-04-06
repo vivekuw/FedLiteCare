@@ -10,6 +10,7 @@ import torch
 from torch.utils.data import TensorDataset
 
 DEFAULT_TARGET_COLUMN = "Outcome"
+IGNORED_NON_FEATURE_COLUMNS = {"id", "record_id", "row_id", "sample_id", "patient_id"}
 
 
 def load_csv_records(csv_path: Path) -> list[dict[str, str]]:
@@ -26,8 +27,13 @@ def load_csv_records(csv_path: Path) -> list[dict[str, str]]:
     return records
 
 
-def _get_feature_columns(records: list[dict[str, str]], target_column: str) -> list[str]:
-    feature_columns = [column for column in records[0].keys() if column != target_column]
+def infer_feature_columns(records: list[dict[str, str]], target_column: str) -> list[str]:
+    """Infer model feature columns while skipping known identifier columns."""
+    feature_columns = [
+        column
+        for column in records[0].keys()
+        if column != target_column and column.lower() not in IGNORED_NON_FEATURE_COLUMNS
+    ]
     if not feature_columns:
         raise ValueError("No feature columns were found in the dataset.")
     return feature_columns
@@ -45,7 +51,7 @@ def fit_preprocessor(
     target_column: str = DEFAULT_TARGET_COLUMN,
 ) -> tuple[torch.Tensor, torch.Tensor, dict[str, Any]]:
     """Fit preprocessing statistics and return normalized tensors."""
-    feature_columns = _get_feature_columns(records, target_column)
+    feature_columns = infer_feature_columns(records, target_column)
     collected_values: dict[str, list[float]] = {column: [] for column in feature_columns}
     labels: list[float] = []
 

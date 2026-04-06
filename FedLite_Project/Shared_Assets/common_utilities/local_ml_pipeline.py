@@ -17,8 +17,15 @@ from FedLite_Project.Shared_Assets.common_utilities.common_utils import (
     resolve_path,
 )
 from FedLite_Project.Shared_Assets.common_utilities.hospital_quality_reports import (
+    append_predicted_patients_row,
+    append_prediction_registry_row,
     create_prediction_report,
+    export_csv_prediction_results,
+    normalize_patient_metadata,
     validate_training_dataset,
+)
+from FedLite_Project.Shared_Assets.common_utilities.patient_input_rules import (
+    get_patient_input_rules,
 )
 from FedLite_Project.Shared_Assets.data_preprocessing_helpers.preprocessing_utils import (
     fit_preprocessor,
@@ -107,6 +114,155 @@ def _resolve_optional_cli_path(path: Path | None, default_path: Path) -> Path:
     return _resolve_existing_path(path)
 
 
+def _find_latest_checkpoint(checkpoint_dir: Path) -> Path | None:
+    checkpoint_files = sorted(
+        (
+            file_path
+            for file_path in checkpoint_dir.glob("*.pt")
+            if file_path.is_file()
+        ),
+        key=lambda file_path: file_path.stat().st_mtime,
+        reverse=True,
+    )
+    if not checkpoint_files:
+        return None
+    return checkpoint_files[0]
+
+
+def _resolve_default_model_path(
+    settings: dict[str, Any],
+    paths: dict[str, Path],
+    requested_model_path: Path | None = None,
+) -> Path:
+    """Return the best available model for inference, preferring the local checkpoint."""
+    if requested_model_path is not None:
+        resolved_requested_model_path = _resolve_existing_path(requested_model_path)
+        if not resolved_requested_model_path.exists():
+            raise FileNotFoundError(
+                f"Requested model checkpoint was not found: {resolved_requested_model_path}"
+            )
+        return resolved_requested_model_path
+
+    local_model_path = resolve_path(paths["models_dir"], str(settings["model_filename"]))
+    if local_model_path.exists():
+        return local_model_path
+
+    latest_received_global_model = _find_latest_checkpoint(paths["received_global_models_dir"])
+    if latest_received_global_model is not None:
+        return latest_received_global_model
+
+    hospital_name = str(settings.get("hospital_name", paths["hospital_root"].name))
+    raise FileNotFoundError(
+        f"No model checkpoint is available for {hospital_name}. "
+        "Train the local model or sync with the aggregator first."
+    )
+
+
+def resolve_hospital_model_path(
+    config_path: Path,
+    requested_model_path: Path | None = None,
+) -> Path:
+    """Resolve the best available checkpoint path for a hospital."""
+    settings, paths = load_hospital_context(config_path)
+    return _resolve_default_model_path(
+        settings=settings,
+        paths=paths,
+        requested_model_path=requested_model_path,
+    )
+
+
+def _validate_patient_input_values(
+    feature_columns: list[str],
+    patient_values: dict[str, str | float],
+) -> dict[str, str]:
+    """Require non-empty numeric values that stay within safe demo ranges."""
+    cleaned_values: dict[str, str] = {}
+    missing_fields: list[str] = []
+    invalid_fields: list[str] = []
+    range_errors: list[str] = []
+    rules = get_patient_input_rules(feature_columns)
+
+    for column in feature_columns:
+        raw_value = str(patient_values.get(column, "")).strip()
+        if not raw_value:
+            missing_fields.append(column)
+            continue
+
+        try:
+            numeric_value = float(raw_value)
+        except ValueError:
+            invalid_fields.append(column)
+            continue
+
+        rule = rules.get(column)
+        if rule is not None:
+            minimum = float(rule["minimum"])
+            maximum = float(rule["maximum"])
+            if numeric_value < minimum or numeric_value > maximum:
+                range_errors.append(f"{column} must be between {minimum:g} and {maximum:g}")
+                continue
+            if bool(rule.get("integer_only", False)) and not numeric_value.is_integer():
+                range_errors.append(f"{column} must be a whole number")
+                continue
+
+        cleaned_values[column] = str(int(numeric_value)) if rule and bool(rule.get("integer_only", False)) else raw_value
+
+    if missing_fields or invalid_fields or range_errors:
+        message_parts: list[str] = []
+        if missing_fields:
+            message_parts.append(
+                "Missing fields: " + ", ".join(missing_fields)
+            )
+        if invalid_fields:
+            message_parts.append(
+                "Non-numeric fields: " + ", ".join(invalid_fields)
+            )
+        if range_errors:
+            message_parts.append(
+                "Out-of-range values: " + "; ".join(range_errors)
+            )
+        raise ValueError(
+            "Please enter valid patient values before prediction. " + " | ".join(message_parts)
+        )
+
+    return cleaned_values
+
+
+def _validate_prediction_csv_compatibility(
+    records: list[dict[str, str]],
+    feature_columns: list[str],
+    target_column: str,
+    input_path: Path,
+) -> None:
+    """Ensure uploaded CSVs match the currently trained diabetes model schema."""
+    csv_columns = list(records[0].keys())
+    missing_columns = [column for column in feature_columns if column not in csv_columns]
+
+    if missing_columns:
+        available_columns = ", ".join(csv_columns)
+        expected_columns = ", ".join(feature_columns)
+        raise ValueError(
+            "This CSV does not match the current FedLiteCare diabetes model.\n\n"
+            f"File: {input_path}\n"
+            f"Missing required columns: {', '.join(missing_columns)}\n"
+            f"Expected model columns: {expected_columns}\n"
+            f"Available CSV columns: {available_columns}\n\n"
+            "Use a CSV built with the 8 numeric diabetes fields used by this hospital model."
+        )
+
+    target_candidates = [target_column, "Outcome", "class"]
+    populated_target_columns = [
+        column_name
+        for column_name in target_candidates
+        if column_name in csv_columns and any((record.get(column_name) or "").strip() for record in records)
+    ]
+    if len(populated_target_columns) > 1:
+        raise ValueError(
+            "This CSV contains more than one populated outcome/label column. "
+            "Keep only one target column or remove labels for pure screening."
+        )
+
+
 def get_hospital_round_transfer_paths(config_path: Path, round_name: str) -> dict[str, Path]:
     """Return round-specific inbound and outbound model paths for a hospital."""
     settings, paths = load_hospital_context(config_path)
@@ -117,6 +273,26 @@ def get_hospital_round_transfer_paths(config_path: Path, round_name: str) -> dic
         "received_global_model_path": paths["received_global_models_dir"] / f"{round_name}_global_model.pt",
         "local_update_path": paths["local_updates_dir"] / f"{round_name}_{hospital_slug}_update.pt",
     }
+
+
+def get_hospital_global_model_paths(
+    config_path: Path,
+    round_name: str | None = None,
+) -> dict[str, Path]:
+    """Return the cached and archived global-model paths for a hospital."""
+    settings, paths = load_hospital_context(config_path)
+    current_global_model_path = resolve_path(
+        paths["received_global_models_dir"],
+        str(settings.get("current_global_model_filename", "current_global_model.pt")),
+    )
+    global_model_paths = {
+        "current_global_model_path": current_global_model_path,
+    }
+    if round_name is not None:
+        global_model_paths["round_received_global_model_path"] = (
+            paths["received_global_models_dir"] / f"{round_name}_global_model.pt"
+        )
+    return global_model_paths
 
 
 def train_local_model(
@@ -206,9 +382,12 @@ def train_local_model(
             input_dim=features.shape[1],
             hidden_dim=int(settings.get("hidden_dim", 16)),
         )
+        
+        global_model_state = None
         if resolved_initial_model_path is not None:
             _, base_checkpoint = load_checkpoint(resolved_initial_model_path, torch.device("cpu"))
-            model.load_state_dict(base_checkpoint["model_state_dict"])
+            global_model_state = base_checkpoint["model_state_dict"]
+            model.load_state_dict(global_model_state)
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         trained_model, history, validation_metrics = train_classifier(
@@ -218,6 +397,8 @@ def train_local_model(
             epochs=int(settings.get("epochs", 80)),
             learning_rate=float(settings.get("learning_rate", 0.001)),
             device=device,
+            global_model_state=global_model_state,
+            mu=float(settings.get("fedprox_mu", 0.01) if global_model_state else 0.0),
         )
 
         save_checkpoint(
@@ -305,9 +486,8 @@ def predict_from_csv(
     hospital_name = str(settings.get("hospital_name", paths["hospital_root"].name))
 
     default_input_path = resolve_path(paths["uploads_dir"], str(settings["dataset_filename"]))
-    default_model_path = resolve_path(paths["models_dir"], str(settings["model_filename"]))
     resolved_input_path = _resolve_optional_cli_path(input_path, default_input_path)
-    resolved_model_path = _resolve_optional_cli_path(model_path, default_model_path)
+    resolved_model_path = _resolve_default_model_path(settings, paths, model_path)
     prediction_log_path = resolve_path(
         paths["logs_dir"],
         str(settings.get("prediction_log_filename", "prediction.log")),
@@ -317,6 +497,12 @@ def predict_from_csv(
     model, checkpoint = load_checkpoint(resolved_model_path, device)
 
     records = load_csv_records(resolved_input_path)
+    _validate_prediction_csv_compatibility(
+        records=records,
+        feature_columns=list(checkpoint["preprocessing"]["feature_columns"]),
+        target_column=str(checkpoint["preprocessing"]["target_column"]),
+        input_path=resolved_input_path,
+    )
     features, labels = transform_records(records, checkpoint["preprocessing"])
     probabilities = predict_probabilities(model, features, device)
     threshold = 0.5
@@ -339,6 +525,14 @@ def predict_from_csv(
         ).unsqueeze(1)
         accuracy = float((predicted_tensor == labels).float().mean().item())
 
+    prediction_output_path = export_csv_prediction_results(
+        config_path=config_path,
+        input_path=resolved_input_path,
+        input_records=records,
+        prediction_rows=prediction_rows,
+        model_path=resolved_model_path,
+    )
+
     append_log_entry(
         prediction_log_path,
         title="Prediction run",
@@ -349,6 +543,7 @@ def predict_from_csv(
             "rows_scored": len(prediction_rows),
             "positive_predictions": sum(row["predicted_label"] for row in prediction_rows),
             "accuracy": "N/A" if accuracy is None else round(accuracy, 6),
+            "prediction_output_path": prediction_output_path,
             "status": "completed",
         },
     )
@@ -360,6 +555,7 @@ def predict_from_csv(
         "log_path": prediction_log_path,
         "predictions": prediction_rows,
         "accuracy": accuracy,
+        "prediction_output_path": prediction_output_path,
     }
 
 
@@ -367,12 +563,12 @@ def predict_from_patient_values(
     config_path: Path,
     patient_values: dict[str, str | float],
     model_path: Path | None = None,
+    patient_metadata: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Generate a diabetes prediction for one patient record from in-memory field values."""
     settings, paths = load_hospital_context(config_path)
     hospital_name = str(settings.get("hospital_name", paths["hospital_root"].name))
-    default_model_path = resolve_path(paths["models_dir"], str(settings["model_filename"]))
-    resolved_model_path = _resolve_optional_cli_path(model_path, default_model_path)
+    resolved_model_path = _resolve_default_model_path(settings, paths, model_path)
     prediction_log_path = resolve_path(
         paths["logs_dir"],
         str(settings.get("prediction_log_filename", "prediction.log")),
@@ -381,10 +577,9 @@ def predict_from_patient_values(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model, checkpoint = load_checkpoint(resolved_model_path, device)
     feature_columns = list(checkpoint["preprocessing"]["feature_columns"])
-    record = {
-        column: str(patient_values.get(column, "")).strip()
-        for column in feature_columns
-    }
+    record = _validate_patient_input_values(feature_columns, patient_values)
+    normalized_patient_metadata = normalize_patient_metadata(patient_metadata)
+    patient_case_id = normalized_patient_metadata["patient_case_id"]
 
     features, _ = transform_records([record], checkpoint["preprocessing"])
     probability = float(predict_probabilities(model, features, device).view(-1)[0].item())
@@ -396,6 +591,7 @@ def predict_from_patient_values(
         details={
             "hospital_name": hospital_name,
             "model_path": resolved_model_path,
+            "patient_case_id": patient_case_id,
             "probability": round(probability, 6),
             "predicted_label": predicted_label,
             "status": "completed",
@@ -411,6 +607,34 @@ def predict_from_patient_values(
             "predicted_label": predicted_label,
             "result_label": result_label,
             "confidence_score": confidence_score,
+            "patient_case_id": patient_case_id,
+            "patient_metadata": normalized_patient_metadata,
+        },
+    )
+    prediction_registry_path = append_prediction_registry_row(
+        config_path=config_path,
+        patient_values=record,
+        prediction_result={
+            "model_path": resolved_model_path,
+            "predicted_label": predicted_label,
+            "result_label": result_label,
+            "confidence_score": confidence_score,
+            "patient_case_id": patient_case_id,
+            "report_path": report_path,
+            "patient_metadata": normalized_patient_metadata,
+        },
+    )
+    predicted_patients_path = append_predicted_patients_row(
+        config_path=config_path,
+        patient_values=record,
+        prediction_result={
+            "model_path": resolved_model_path,
+            "predicted_label": predicted_label,
+            "result_label": result_label,
+            "confidence_score": confidence_score,
+            "patient_case_id": patient_case_id,
+            "report_path": report_path,
+            "patient_metadata": normalized_patient_metadata,
         },
     )
     append_log_entry(
@@ -418,7 +642,10 @@ def predict_from_patient_values(
         title="Prediction report generated",
         details={
             "hospital_name": hospital_name,
+            "patient_case_id": patient_case_id,
             "report_path": report_path,
+            "prediction_registry_path": prediction_registry_path,
+            "predicted_patients_path": predicted_patients_path,
             "result_label": result_label,
             "confidence_score": round(confidence_score, 6),
         },
@@ -434,4 +661,8 @@ def predict_from_patient_values(
         "confidence_score": confidence_score,
         "result_label": result_label,
         "report_path": report_path,
+        "prediction_registry_path": prediction_registry_path,
+        "predicted_patients_path": predicted_patients_path,
+        "patient_case_id": patient_case_id,
+        "patient_metadata": normalized_patient_metadata,
     }

@@ -26,6 +26,26 @@ The project is already configured for localhost testing:
 
 ## Startup Order
 
+For the easiest Windows demo, use:
+
+```powershell
+.\Run_Demo_Round.ps1
+```
+
+That script opens four PowerShell windows automatically, starts the aggregator first, then starts Hospital A, Hospital B, and Hospital C, and uses a short automatic startup delay so the round can begin without manual `Enter` confirmation.
+
+## Daily Midnight Run
+
+For an automatic once-per-day run, use:
+
+```powershell
+.\Run_Daily_Federated_Round.ps1
+```
+
+That script runs a full one-laptop federated round in `single-process` mode and exits automatically, which is more suitable for `12:00 AM` automation than the 4-terminal demo.
+
+## Manual Startup Order
+
 1. Open Terminal 1 in `FedLite_Project/` and run:
 
 ```powershell
@@ -34,23 +54,27 @@ The project is already configured for localhost testing:
 
 2. Wait until the aggregator says its listeners are ready.
 
-3. Open Terminal 2 in `FedLite_Project/` and run:
+3. Leave the aggregator terminal open. It now pauses and waits for you to confirm that the hospitals are ready.
+
+4. Open Terminal 2 in `FedLite_Project/` and run:
 
 ```powershell
 .\Start_Hospital_A.ps1
 ```
 
-4. Open Terminal 3 in `FedLite_Project/` and run:
+5. Open Terminal 3 in `FedLite_Project/` and run:
 
 ```powershell
 .\Start_Hospital_B.ps1
 ```
 
-5. Open Terminal 4 in `FedLite_Project/` and run:
+6. Open Terminal 4 in `FedLite_Project/` and run:
 
 ```powershell
 .\Start_Hospital_C.ps1
 ```
+
+7. Go back to Terminal 1 and press `Enter` to let the aggregator distribute the current global model.
 
 ## What Happens
 
@@ -81,6 +105,8 @@ python .\Hospital_C\client\hospital_c_client.py federated-round
 - Hospital runtime flow: `Hospital_X/logs/federated_client.log`
 - Hospital training metrics: `Hospital_X/logs/training.log`
 - Hospital transfer activity: `Hospital_X/logs/transfer.log`
+- Demo summary export: `Demo_Outputs/demo_logs/round_xxx_demo_summary.txt`
+- Demo JSON export: `Demo_Outputs/test_outputs/round_xxx/demo_summary.json`
 
 ## Important Notes
 

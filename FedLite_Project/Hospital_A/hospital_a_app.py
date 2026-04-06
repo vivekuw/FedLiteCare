@@ -28,7 +28,7 @@ from FedLite_Project.Hospital_A.communication.ltx_transfer import (  # noqa: E40
 from FedLite_Project.Shared_Assets.common_utilities.runtime_paths import (  # noqa: E402
     resolve_hospital_runtime_paths,
 )
-from FedLite_Project.Shared_Assets.common_utilities.tkinter_hospital_app import (  # noqa: E402
+from FedLite_Project.Shared_Assets.common_utilities.tkinter_research_node_app import (  # noqa: E402
     launch_hospital_gui,
 )
 
@@ -37,19 +37,19 @@ DEFAULT_RUNTIME_PATHS = resolve_hospital_runtime_paths("Hospital_A", CURRENT_FIL
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Launch the FedLiteCare Hospital A desktop client."
+        description="Launch the FedLiteCare Hospital A research node client."
     )
     parser.add_argument(
         "--config",
         type=Path,
         default=DEFAULT_RUNTIME_PATHS.config_path,
-        help="Optional Hospital A client config path.",
+        help="Optional Hospital A node config path.",
     )
     parser.add_argument(
         "--transfer-config",
         type=Path,
         default=DEFAULT_RUNTIME_PATHS.transfer_config_path,
-        help="Optional Hospital A LTX transfer config path.",
+        help="Optional Hospital A LTX node transfer config path.",
     )
     args = parser.parse_args()
 

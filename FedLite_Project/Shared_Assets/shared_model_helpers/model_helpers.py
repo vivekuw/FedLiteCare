@@ -68,8 +68,10 @@ def train_classifier(
     epochs: int,
     learning_rate: float,
     device: torch.device,
+    global_model_state: dict[str, torch.Tensor] | None = None,
+    mu: float = 0.0,
 ) -> tuple[nn.Module, list[dict[str, float]], dict[str, float]]:
-    """Train the model and keep the best validation checkpoint in memory."""
+    """Train the model using FedProx-style proximal optimization if enabled."""
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     model.to(device)
@@ -77,6 +79,12 @@ def train_classifier(
     history: list[dict[str, float]] = []
     best_state = copy.deepcopy(model.state_dict())
     best_metrics = {"loss": float("inf"), "accuracy": 0.0}
+
+    # Pre-calculate global tensors on device once if mu > 0
+    global_tensors = {}
+    if global_model_state is not None and mu > 0.0:
+        for name, param in global_model_state.items():
+            global_tensors[name] = param.to(device)
 
     for epoch in range(1, epochs + 1):
         model.train()
@@ -90,6 +98,15 @@ def train_classifier(
             optimizer.zero_grad()
             logits = model(batch_features)
             loss = criterion(logits, batch_labels)
+
+            # Add FedProx proximal term: (mu / 2) * ||w - w_t||^2
+            if global_tensors and mu > 0.0:
+                proximal_term = 0.0
+                for name, param in model.named_parameters():
+                    if name in global_tensors:
+                        proximal_term += ((param - global_tensors[name]) ** 2).sum()
+                loss += (mu / 2.0) * proximal_term
+
             loss.backward()
             optimizer.step()
 

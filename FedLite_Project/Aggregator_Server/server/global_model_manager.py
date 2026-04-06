@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 import threading
+import time
 from datetime import datetime
 from pathlib import Path
 from queue import Queue
@@ -31,6 +33,9 @@ from FedLite_Project.Aggregator_Server.server.model_version_saver import (
     load_version_history,
     save_global_model_versions,
 )
+from FedLite_Project.Aggregator_Server.server.demo_output_manager import (
+    export_demo_round_artifacts,
+)
 from FedLite_Project.Aggregator_Server.server.round_manager import RoundManager
 from FedLite_Project.Hospital_A.communication.ltx_transfer import (
     receive_global_model_via_ltx as receive_global_model_hospital_a,
@@ -50,16 +55,23 @@ from FedLite_Project.Shared_Assets.common_utilities.common_utils import (
     load_simple_yaml_config,
     resolve_path,
 )
+from FedLite_Project.Shared_Assets.common_utilities.hospital_quality_reports import (
+    get_latest_report_file,
+    read_labeled_report_value,
+    validate_training_dataset,
+)
 from FedLite_Project.Shared_Assets.common_utilities.ltx_core import (
     finish_receiver_thread,
     start_receiver_thread,
 )
 from FedLite_Project.Shared_Assets.common_utilities.local_ml_pipeline import (
+    get_hospital_global_model_paths,
     get_hospital_round_transfer_paths,
     load_hospital_context,
     train_local_model,
 )
 from FedLite_Project.Shared_Assets.data_preprocessing_helpers.preprocessing_utils import (
+    infer_feature_columns,
     load_csv_records,
 )
 from FedLite_Project.Shared_Assets.shared_model_helpers.model_helpers import load_checkpoint
@@ -146,6 +158,28 @@ def _get_server_node_log_path(settings: dict[str, Any], paths: dict[str, Path]) 
     )
 
 
+def _should_wait_for_hospital_confirmation(settings: dict[str, Any]) -> bool:
+    return bool(settings.get("wait_for_hospital_confirmation", True))
+
+
+def _resolve_wait_for_hospital_confirmation(
+    settings: dict[str, Any],
+    override: bool | None,
+) -> bool:
+    if override is not None:
+        return override
+    return _should_wait_for_hospital_confirmation(settings)
+
+
+def _resolve_startup_delay_seconds(
+    settings: dict[str, Any],
+    override: int | None,
+) -> int:
+    if override is not None:
+        return max(int(override), 0)
+    return max(int(settings.get("distributed_startup_delay_seconds", 0)), 0)
+
+
 def load_server_context(config_path: Path = DEFAULT_CONFIG_PATH) -> tuple[dict[str, Any], dict[str, Path]]:
     """Load aggregator config and resolve the key directories."""
     resolved_config_path = config_path.resolve()
@@ -202,7 +236,7 @@ def _load_hospital_layout(config_path: Path) -> dict[str, Any]:
     target_column = str(settings.get("target_column", "Outcome"))
     dataset_path = resolve_path(paths["uploads_dir"], str(settings["dataset_filename"]))
     records = load_csv_records(dataset_path)
-    feature_columns = [column for column in records[0].keys() if column != target_column]
+    feature_columns = infer_feature_columns(records, target_column)
 
     return {
         "hospital_name": hospital_name,
@@ -230,6 +264,30 @@ def validate_hospital_layouts(hospital_config_paths: dict[str, Path]) -> dict[st
             raise ValueError("Hospital configs do not share the same model settings.")
 
     return reference
+
+
+def validate_hospital_round_readiness(
+    hospital_config_paths: dict[str, Path],
+) -> dict[str, dict[str, Any]]:
+    """Ensure each hospital has a valid local dataset before a federated round starts."""
+    validation_results: dict[str, dict[str, Any]] = {}
+    invalid_hospitals: list[str] = []
+
+    for hospital_name, config_path in hospital_config_paths.items():
+        validation_result = validate_training_dataset(config_path=config_path)
+        validation_results[hospital_name] = validation_result
+        if not validation_result["is_valid"]:
+            invalid_hospitals.append(
+                f"{hospital_name}: {validation_result['status']} | report={validation_result['report_path']}"
+            )
+
+    if invalid_hospitals:
+        raise ValueError(
+            "Cannot start the federated round because one or more node datasets are missing or invalid.\n\n"
+            + "\n".join(invalid_hospitals)
+        )
+
+    return validation_results
 
 
 def _build_initial_global_checkpoint(layout: dict[str, Any]) -> dict[str, Any]:
@@ -315,6 +373,72 @@ def ensure_current_global_model(
     }
 
 
+def _read_checkpoint_round_info(checkpoint_path: Path) -> tuple[int, str]:
+    _, checkpoint = load_checkpoint(checkpoint_path, torch.device("cpu"))
+    aggregation_metadata = dict(checkpoint.get("aggregation_metadata", {}))
+    round_number = int(aggregation_metadata.get("round_number", 0))
+    round_name = str(aggregation_metadata.get("round_name", "")).strip() or f"round_{round_number:03d}"
+    return round_number, round_name
+
+
+def inspect_hospital_global_caches(
+    hospital_config_paths: dict[str, Path],
+    current_global_model_path: Path,
+) -> dict[str, Any]:
+    """Inspect each hospital's cached global model before starting a new round."""
+    _, current_server_round_name = _read_checkpoint_round_info(current_global_model_path)
+    cache_statuses: dict[str, dict[str, Any]] = {}
+    missing_hospitals: list[str] = []
+    stale_hospitals: list[str] = []
+
+    for hospital_name, config_path in hospital_config_paths.items():
+        current_cache_path = get_hospital_global_model_paths(config_path)["current_global_model_path"]
+        hospital_status: dict[str, Any] = {
+            "current_global_model_path": current_cache_path,
+            "exists": current_cache_path.exists(),
+            "round_name": None,
+            "needs_bootstrap": False,
+        }
+        if current_cache_path.exists():
+            _, cache_round_name = _read_checkpoint_round_info(current_cache_path)
+            hospital_status["round_name"] = cache_round_name
+            if cache_round_name != current_server_round_name:
+                hospital_status["needs_bootstrap"] = True
+                stale_hospitals.append(hospital_name)
+        else:
+            missing_hospitals.append(hospital_name)
+            hospital_status["needs_bootstrap"] = True
+
+        cache_statuses[hospital_name] = hospital_status
+
+    return {
+        "server_round_name": current_server_round_name,
+        "statuses": cache_statuses,
+        "missing_hospitals": missing_hospitals,
+        "stale_hospitals": stale_hospitals,
+    }
+
+
+def quarantine_stale_hospital_caches(
+    cache_inspection: dict[str, Any],
+) -> dict[str, Path]:
+    """Move stale node caches aside so the hospital will wait for a clean bootstrap model."""
+    backup_paths: dict[str, Path] = {}
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    for hospital_name in cache_inspection.get("stale_hospitals", []):
+        hospital_status = cache_inspection["statuses"][hospital_name]
+        current_cache_path = Path(hospital_status["current_global_model_path"])
+        cache_round_name = str(hospital_status.get("round_name") or "unknown")
+        backup_path = current_cache_path.with_name(
+            f"{current_cache_path.stem}_{cache_round_name}_stale_{timestamp}{current_cache_path.suffix}"
+        )
+        shutil.move(current_cache_path, backup_path)
+        backup_paths[hospital_name] = backup_path
+
+    return backup_paths
+
+
 def distribute_global_model_to_hospitals(
     hospital_config_paths: dict[str, Path],
     global_model_path: Path,
@@ -324,6 +448,7 @@ def distribute_global_model_to_hospitals(
     distributed_paths: dict[str, Path] = {}
     for hospital_name, config_path in hospital_config_paths.items():
         transfer_paths = get_hospital_round_transfer_paths(config_path, round_name)
+        current_cache_path = get_hospital_global_model_paths(config_path)["current_global_model_path"]
         ensure_directory(transfer_paths["received_global_model_path"].parent)
 
         receiver_thread, result_queue = start_receiver_thread(
@@ -337,8 +462,58 @@ def distribute_global_model_to_hospitals(
             round_name=round_name,
         )
         finish_receiver_thread(receiver_thread, result_queue)
+        if transfer_paths["received_global_model_path"] != current_cache_path:
+            shutil.copy2(transfer_paths["received_global_model_path"], current_cache_path)
         distributed_paths[hospital_name] = transfer_paths["received_global_model_path"]
     return distributed_paths
+
+
+def _bootstrap_missing_hospital_models(
+    hospital_config_paths: dict[str, Path],
+    current_global_model_path: Path,
+    current_global_round_name: str,
+    missing_hospitals: list[str],
+) -> dict[str, dict[str, Any]]:
+    """Send the current global model only to nodes that do not have a cached copy yet."""
+    if not missing_hospitals:
+        return {}
+
+    send_results_queue: Queue[tuple[str, str, Any]] = Queue(maxsize=len(missing_hospitals))
+    sender_threads: dict[str, threading.Thread] = {}
+    for hospital_name in missing_hospitals:
+        sender_threads[hospital_name] = _start_background_task(
+            task_name=hospital_name,
+            task_callable=send_global_model_to_hospital,
+            result_queue=send_results_queue,
+            hospital_name=hospital_name,
+            source_path=current_global_model_path,
+            round_name=current_global_round_name,
+        )
+    return _await_background_tasks(sender_threads, send_results_queue)
+
+
+def _send_refreshed_global_model_to_hospitals(
+    hospital_config_paths: dict[str, Path],
+    latest_global_model_path: Path,
+    round_name: str,
+) -> tuple[dict[str, dict[str, Any]], dict[str, Path]]:
+    """Send the newly aggregated global model to every node for the next round."""
+    send_results_queue: Queue[tuple[str, str, Any]] = Queue(maxsize=len(HOSPITAL_ORDER))
+    sender_threads: dict[str, threading.Thread] = {}
+    expected_cache_paths: dict[str, Path] = {}
+    for hospital_name in HOSPITAL_ORDER:
+        expected_cache_paths[hospital_name] = get_hospital_global_model_paths(
+            hospital_config_paths[hospital_name]
+        )["current_global_model_path"]
+        sender_threads[hospital_name] = _start_background_task(
+            task_name=hospital_name,
+            task_callable=send_global_model_to_hospital,
+            result_queue=send_results_queue,
+            hospital_name=hospital_name,
+            source_path=latest_global_model_path,
+            round_name=round_name,
+        )
+    return _await_background_tasks(sender_threads, send_results_queue), expected_cache_paths
 
 
 def run_hospital_training_rounds(
@@ -506,6 +681,84 @@ def _complete_aggregation_round(
     }
 
 
+def _build_hospital_update_summaries(
+    hospital_config_paths: dict[str, Path],
+    received_updates: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    checkpoint_payloads = _load_received_checkpoint_payloads(received_updates)
+    hospital_summaries: dict[str, dict[str, Any]] = {}
+
+    for hospital_name in HOSPITAL_ORDER:
+        config_path = hospital_config_paths[hospital_name]
+        settings, hospital_paths = load_hospital_context(config_path)
+        checkpoint = checkpoint_payloads[hospital_name]
+        training_metrics = dict(checkpoint.get("training_metrics", {}))
+        latest_validation_report = get_latest_report_file(hospital_paths["validation_reports_dir"])
+        validation_status = (
+            "Unknown"
+            if latest_validation_report is None
+            else read_labeled_report_value(latest_validation_report, "Validation Status") or "Unknown"
+        )
+
+        hospital_summaries[hospital_name] = {
+            "hospital_name": hospital_name,
+            "dataset_filename": str(settings.get("dataset_filename", "")),
+            "dataset_path": str(
+                resolve_path(hospital_paths["uploads_dir"], str(settings["dataset_filename"]))
+            ),
+            "local_model_path": str(
+                resolve_path(hospital_paths["models_dir"], str(settings["model_filename"]))
+            ),
+            "received_update_path": str(received_updates[hospital_name]["received_path"]),
+            "validation_report_path": None if latest_validation_report is None else str(latest_validation_report),
+            "validation_status": validation_status,
+            "validation_accuracy": training_metrics.get("accuracy"),
+            "validation_loss": training_metrics.get("loss"),
+            "bytes_sent": int(received_updates[hospital_name]["bytes_sent"]),
+            "bytes_received": int(received_updates[hospital_name]["bytes_received"]),
+            "checkpoint_round_name": str(
+                dict(checkpoint.get("metadata", {})).get("round_name", "")
+            ),
+        }
+
+    return hospital_summaries
+
+
+def _export_demo_outputs(
+    paths: dict[str, Path],
+    round_name: str,
+    round_number: int,
+    current_global_model_path: Path,
+    aggregation_result: dict[str, Any],
+    hospital_summaries: dict[str, dict[str, Any]],
+    mode: str,
+    node_log_path: Path | None = None,
+) -> dict[str, Path]:
+    project_root = paths["aggregator_root"].parent
+    summary_payload = {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "round_name": round_name,
+        "round_number": round_number,
+        "mode": mode,
+        "starting_global_model": str(current_global_model_path),
+        "new_global_model": str(aggregation_result["global_model_path"]),
+        "latest_global_model": str(aggregation_result["latest_model_path"]),
+        "version_history_path": str(aggregation_result["version_history_path"]),
+        "round_state_path": str(aggregation_result["round_state_path"]),
+        "aggregator_runtime_log": None if node_log_path is None else str(node_log_path),
+        "aggregator_log": str(aggregation_result["aggregation_log_path"]),
+        "round_log": str(
+            aggregation_result.get(
+                "round_log_path",
+                resolve_path(paths["logs_dir"], "round_log.log"),
+            )
+        ),
+        "hospital_order": list(HOSPITAL_ORDER),
+        "hospitals": hospital_summaries,
+    }
+    return export_demo_round_artifacts(project_root, summary_payload)
+
+
 def run_aggregation_round(
     config_path: Path = DEFAULT_CONFIG_PATH,
     hospital_model_overrides: dict[str, Path | None] | None = None,
@@ -536,10 +789,14 @@ def run_aggregation_round(
 def run_distributed_federated_round(
     config_path: Path = DEFAULT_CONFIG_PATH,
     progress_callback: Callable[[str], None] | None = None,
+    wait_for_hospital_confirmation: bool | None = None,
+    startup_delay_seconds: int | None = None,
 ) -> dict[str, Any]:
-    """Run one aggregator-led round with hospitals in separate terminals."""
+    """Run one aggregator-led round using cached node globals plus end-of-round redistribution."""
     settings, paths = load_server_context(config_path)
     hospital_config_paths = load_hospital_config_paths(settings, paths["aggregator_root"])
+    _emit(progress_callback, "Preflight check: validating node datasets before opening listeners...")
+    validate_hospital_round_readiness(hospital_config_paths)
     round_manager = RoundManager(
         resolve_path(paths["aggregator_root"], str(settings["round_state_filename"]))
     )
@@ -556,12 +813,27 @@ def run_distributed_federated_round(
         },
     )
 
-    _emit(progress_callback, f"[1/6] Loading or creating the global model for {round_name}...")
+    _emit(progress_callback, f"[1/7] Loading or creating the global model for {round_name}...")
     global_model_info = ensure_current_global_model(settings, paths, hospital_config_paths)
     current_global_model_path = Path(global_model_info["global_model_path"])
-    _emit(progress_callback, f"Aggregator using global model: {current_global_model_path}")
+    _, current_global_round_name = _read_checkpoint_round_info(current_global_model_path)
+    cache_inspection = inspect_hospital_global_caches(
+        hospital_config_paths=hospital_config_paths,
+        current_global_model_path=current_global_model_path,
+    )
+    stale_cache_backups = quarantine_stale_hospital_caches(cache_inspection)
+    bootstrap_hospitals = sorted(
+        set(cache_inspection["missing_hospitals"]) | set(cache_inspection["stale_hospitals"])
+    )
+    _emit(
+        progress_callback,
+        (
+            f"Aggregator using global model: {current_global_model_path} "
+            f"(cached round {current_global_round_name})"
+        ),
+    )
 
-    _emit(progress_callback, f"[2/6] Opening update listeners for Hospital_A, Hospital_B, and Hospital_C...")
+    _emit(progress_callback, f"[2/7] Opening update listeners for Hospital_A, Hospital_B, and Hospital_C...")
     round_received_dir = ensure_directory(paths["received_models_dir"] / round_name)
     receiver_threads: dict[str, dict[str, Any]] = {}
     for hospital_name in HOSPITAL_ORDER:
@@ -583,48 +855,119 @@ def run_distributed_federated_round(
         details={
             "round_name": round_name,
             "received_round_dir": round_received_dir,
+            "bootstrap_targets": ", ".join(bootstrap_hospitals) or "None",
+            "stale_cache_backups": (
+                ", ".join(f"{hospital_name}={backup_path}" for hospital_name, backup_path in stale_cache_backups.items())
+                or "None"
+            ),
         },
     )
     _emit(
         progress_callback,
         "Aggregator listeners are ready. Start Hospital_A, Hospital_B, and Hospital_C terminals now.",
     )
-
-    _emit(progress_callback, f"[3/6] Sending the current global model to all hospital terminals via LTX...")
-    send_results_queue: Queue[tuple[str, str, Any]] = Queue(maxsize=len(HOSPITAL_ORDER))
-    sender_threads: dict[str, threading.Thread] = {}
-    expected_distributed_models: dict[str, Path] = {}
-    for hospital_name in HOSPITAL_ORDER:
-        expected_distributed_models[hospital_name] = get_hospital_round_transfer_paths(
-            hospital_config_paths[hospital_name],
-            round_name,
-        )["received_global_model_path"]
-        sender_threads[hospital_name] = _start_background_task(
-            task_name=hospital_name,
-            task_callable=send_global_model_to_hospital,
-            result_queue=send_results_queue,
-            hospital_name=hospital_name,
-            source_path=current_global_model_path,
-            round_name=round_name,
+    resolved_wait_for_confirmation = _resolve_wait_for_hospital_confirmation(
+        settings,
+        wait_for_hospital_confirmation,
+    )
+    resolved_startup_delay_seconds = _resolve_startup_delay_seconds(
+        settings,
+        startup_delay_seconds,
+    )
+    if resolved_wait_for_confirmation:
+        append_log_entry(
+            node_log_path,
+            title="Waiting for hospital startup confirmation",
+            details={
+                "round_name": round_name,
+                "status": "paused_before_distribution",
+            },
         )
-    send_results = _await_background_tasks(sender_threads, send_results_queue)
-    for hospital_name in HOSPITAL_ORDER:
+        input(
+            "Press Enter after Hospital_A, Hospital_B, and Hospital_C are running "
+            "and ready to start their local round..."
+        )
+        append_log_entry(
+            node_log_path,
+            title="Hospital startup confirmation received",
+            details={
+                "round_name": round_name,
+                "status": "continuing_distribution",
+            },
+        )
+    elif resolved_startup_delay_seconds > 0:
+        append_log_entry(
+            node_log_path,
+            title="Waiting for automatic startup delay",
+            details={
+                "round_name": round_name,
+                "startup_delay_seconds": resolved_startup_delay_seconds,
+                "status": "delayed_before_distribution",
+            },
+        )
         _emit(
             progress_callback,
-            f"Aggregator sent {round_name} global model to {hospital_name}.",
+            (
+                f"Waiting {resolved_startup_delay_seconds} seconds for hospital terminals "
+                "to finish starting before the round begins..."
+            ),
         )
-    append_log_entry(
-        node_log_path,
-        title="Global model distribution completed",
-        details={
-            "round_name": round_name,
-            "hospital_a_bytes_sent": send_results["Hospital_A"]["bytes_sent"],
-            "hospital_b_bytes_sent": send_results["Hospital_B"]["bytes_sent"],
-            "hospital_c_bytes_sent": send_results["Hospital_C"]["bytes_sent"],
-        },
-    )
+        time.sleep(resolved_startup_delay_seconds)
 
-    _emit(progress_callback, f"[4/6] Waiting for all hospital updates to arrive...")
+    bootstrap_send_results: dict[str, dict[str, Any]] = {}
+    bootstrap_targets: dict[str, Path] = {}
+    if bootstrap_hospitals:
+        if stale_cache_backups:
+            _emit(
+                progress_callback,
+                "Stale cached globals were moved aside so those nodes can receive a clean bootstrap model.",
+            )
+        _emit(
+            progress_callback,
+            f"[3/7] Bootstrapping node caches from {current_global_round_name} where needed...",
+        )
+        bootstrap_send_results = _bootstrap_missing_hospital_models(
+            hospital_config_paths=hospital_config_paths,
+            current_global_model_path=current_global_model_path,
+            current_global_round_name=current_global_round_name,
+            missing_hospitals=bootstrap_hospitals,
+        )
+        for hospital_name in bootstrap_hospitals:
+            bootstrap_targets[hospital_name] = get_hospital_global_model_paths(
+                hospital_config_paths[hospital_name]
+            )["current_global_model_path"]
+            _emit(
+                progress_callback,
+                f"Bootstrap global model {current_global_round_name} sent to {hospital_name}.",
+            )
+        append_log_entry(
+            node_log_path,
+            title="Bootstrap model distribution completed",
+            details={
+                "round_name": round_name,
+                "bootstrap_round_name": current_global_round_name,
+                "hospital_targets": ", ".join(bootstrap_hospitals),
+                "stale_cache_backups": (
+                    ", ".join(f"{hospital_name}={backup_path}" for hospital_name, backup_path in stale_cache_backups.items())
+                    or "None"
+                ),
+            },
+        )
+    else:
+        _emit(
+            progress_callback,
+            "[3/7] Bootstrap check complete. All hospitals already have the latest cached global model.",
+        )
+        append_log_entry(
+            node_log_path,
+            title="Bootstrap model distribution skipped",
+            details={
+                "round_name": round_name,
+                "reason": "all_hospitals_already_cached_latest_global_model",
+            },
+        )
+
+    _emit(progress_callback, f"[4/7] Waiting for all hospital updates to arrive...")
     received_updates: dict[str, dict[str, Any]] = {}
     for hospital_name in HOSPITAL_ORDER:
         receiver_result = finish_receiver_thread(
@@ -658,13 +1001,42 @@ def run_distributed_federated_round(
     }
     manifest_path.write_text(json.dumps(manifest_payload, indent=2), encoding="utf-8")
 
-    _emit(progress_callback, f"[5/6] Performing federated averaging for {round_name}...")
+    _emit(progress_callback, f"[5/7] Performing federated averaging for {round_name}...")
     aggregation_result = _complete_aggregation_round(
         settings=settings,
         paths=paths,
         received_updates=received_updates,
         resolved_round_number=round_number,
         resolved_round_name=round_name,
+    )
+    hospital_update_summaries = _build_hospital_update_summaries(
+        hospital_config_paths=hospital_config_paths,
+        received_updates=received_updates,
+    )
+
+    _emit(
+        progress_callback,
+        f"[6/7] Sending the refreshed global model for {round_name} to all hospital terminals via LTX...",
+    )
+    refreshed_send_results, refreshed_global_model_targets = _send_refreshed_global_model_to_hospitals(
+        hospital_config_paths=hospital_config_paths,
+        latest_global_model_path=Path(aggregation_result["latest_model_path"]),
+        round_name=round_name,
+    )
+    for hospital_name in HOSPITAL_ORDER:
+        _emit(
+            progress_callback,
+            f"Refreshed global model {round_name} sent to {hospital_name}.",
+        )
+    append_log_entry(
+        node_log_path,
+        title="Refreshed global model distribution completed",
+        details={
+            "round_name": round_name,
+            "hospital_a_bytes_sent": refreshed_send_results["Hospital_A"]["bytes_sent"],
+            "hospital_b_bytes_sent": refreshed_send_results["Hospital_B"]["bytes_sent"],
+            "hospital_c_bytes_sent": refreshed_send_results["Hospital_C"]["bytes_sent"],
+        },
     )
 
     round_log_path = resolve_path(
@@ -675,12 +1047,18 @@ def run_distributed_federated_round(
         "round_name": round_name,
         "round_number": round_number,
         "starting_global_model": current_global_model_path,
+        "starting_global_round_name": current_global_round_name,
         "new_global_model": aggregation_result["global_model_path"],
         "latest_global_model": aggregation_result["latest_model_path"],
     }
     for hospital_name in HOSPITAL_ORDER:
-        round_log_details[f"{hospital_name.lower()}_distributed_model"] = expected_distributed_models[hospital_name]
+        round_log_details[f"{hospital_name.lower()}_bootstrap_model"] = (
+            bootstrap_targets[hospital_name]
+            if hospital_name in bootstrap_targets
+            else "Cached local copy reused"
+        )
         round_log_details[f"{hospital_name.lower()}_received_update"] = received_updates[hospital_name]["received_path"]
+        round_log_details[f"{hospital_name.lower()}_refreshed_global_model"] = refreshed_global_model_targets[hospital_name]
 
     append_log_entry(
         round_log_path,
@@ -697,17 +1075,32 @@ def run_distributed_federated_round(
             "latest_global_model": aggregation_result["latest_model_path"],
         },
     )
+    demo_export_paths = _export_demo_outputs(
+        paths=paths,
+        round_name=round_name,
+        round_number=round_number,
+        current_global_model_path=current_global_model_path,
+        aggregation_result={**aggregation_result, "round_log_path": round_log_path},
+        hospital_summaries=hospital_update_summaries,
+        mode="distributed",
+        node_log_path=node_log_path,
+    )
 
-    _emit(progress_callback, f"[6/6] Saved new global model version for {round_name}.")
+    _emit(progress_callback, f"[7/7] Saved new global model version for {round_name}.")
     _emit(progress_callback, f"Versioned global model: {aggregation_result['global_model_path']}")
     _emit(progress_callback, f"Latest global model: {aggregation_result['latest_model_path']}")
+    _emit(progress_callback, "All hospitals have now received the refreshed global model for the next round.")
+    _emit(progress_callback, f"Demo summary exported to: {demo_export_paths['summary_text_path']}")
 
     return {
         "round_number": round_number,
         "round_name": round_name,
         "current_global_model_path": current_global_model_path,
-        "distributed_models": expected_distributed_models,
-        "send_results": send_results,
+        "bootstrap_models": bootstrap_targets,
+        "stale_cache_backups": stale_cache_backups,
+        "distributed_models": refreshed_global_model_targets,
+        "bootstrap_send_results": bootstrap_send_results,
+        "send_results": refreshed_send_results,
         "received_updates": aggregation_result["received_updates"],
         "global_model_path": aggregation_result["global_model_path"],
         "latest_model_path": aggregation_result["latest_model_path"],
@@ -716,6 +1109,10 @@ def run_distributed_federated_round(
         "aggregation_log_path": aggregation_result["aggregation_log_path"],
         "round_log_path": round_log_path,
         "node_log_path": node_log_path,
+        "hospital_update_summaries": hospital_update_summaries,
+        "demo_summary_text_path": demo_export_paths["summary_text_path"],
+        "demo_summary_json_path": demo_export_paths["summary_json_path"],
+        "demo_export_manifest_path": demo_export_paths["export_manifest_path"],
     }
 
 
@@ -723,9 +1120,11 @@ def run_full_federated_round(
     config_path: Path = DEFAULT_CONFIG_PATH,
     progress_callback: Callable[[str], None] | None = None,
 ) -> dict[str, Any]:
-    """Run the full one-laptop federated learning simulation round."""
+    """Run the single-process fallback round using cached globals plus end-of-round redistribution."""
     settings, paths = load_server_context(config_path)
     hospital_config_paths = load_hospital_config_paths(settings, paths["aggregator_root"])
+    _emit(progress_callback, "Preflight check: validating node datasets before the round starts...")
+    validate_hospital_round_readiness(hospital_config_paths)
     round_manager = RoundManager(
         resolve_path(paths["aggregator_root"], str(settings["round_state_filename"]))
     )
@@ -735,22 +1134,49 @@ def run_full_federated_round(
     _emit(progress_callback, f"[1/8] Loading or creating the current global model for {round_name}...")
     global_model_info = ensure_current_global_model(settings, paths, hospital_config_paths)
     current_global_model_path = Path(global_model_info["global_model_path"])
+    _, current_global_round_name = _read_checkpoint_round_info(current_global_model_path)
+    cache_inspection = inspect_hospital_global_caches(
+        hospital_config_paths=hospital_config_paths,
+        current_global_model_path=current_global_model_path,
+    )
+    stale_cache_backups = quarantine_stale_hospital_caches(cache_inspection)
+    bootstrap_hospitals = sorted(
+        set(cache_inspection["missing_hospitals"]) | set(cache_inspection["stale_hospitals"])
+    )
     if global_model_info["created_new_model"]:
         _emit(progress_callback, f"Created initial global model: {current_global_model_path}")
     else:
         _emit(progress_callback, f"Loaded existing global model: {current_global_model_path}")
 
-    _emit(
-        progress_callback,
-        f"[2/8] Aggregator sending the global model to all hospitals via LTX on 127.0.0.1 for {round_name}...",
-    )
-    distributed_models = distribute_global_model_to_hospitals(
-        hospital_config_paths=hospital_config_paths,
-        global_model_path=current_global_model_path,
-        round_name=round_name,
-    )
-    for hospital_name, distributed_path in distributed_models.items():
-        _emit(progress_callback, f"{hospital_name} received global model via LTX at: {distributed_path}")
+    bootstrap_models: dict[str, Path] = {}
+    if bootstrap_hospitals:
+        _emit(
+            progress_callback,
+            (
+                f"[2/8] Bootstrapping node caches from {current_global_round_name} "
+                "via localhost LTX..."
+            ),
+        )
+        bootstrap_models = distribute_global_model_to_hospitals(
+            hospital_config_paths={
+                hospital_name: hospital_config_paths[hospital_name]
+                for hospital_name in bootstrap_hospitals
+            },
+            global_model_path=current_global_model_path,
+            round_name=current_global_round_name,
+        )
+        for hospital_name, distributed_path in bootstrap_models.items():
+            _emit(progress_callback, f"{hospital_name} bootstrapped global model at: {distributed_path}")
+        if stale_cache_backups:
+            _emit(
+                progress_callback,
+                "Stale cached globals were moved aside so those nodes could be re-bootstrapped cleanly.",
+            )
+    else:
+        _emit(
+            progress_callback,
+            "[2/8] Bootstrap check complete. All hospitals already have the latest cached global model.",
+        )
 
     hospital_order = ["Hospital_A", "Hospital_B", "Hospital_C"]
     step_labels = {
@@ -762,11 +1188,14 @@ def run_full_federated_round(
     for hospital_name in hospital_order:
         _emit(
             progress_callback,
-            f"{step_labels[hospital_name]} {hospital_name} is training locally from the distributed global model...",
+            f"{step_labels[hospital_name]} {hospital_name} is training locally from its cached global model...",
         )
+        cached_global_model_path = get_hospital_global_model_paths(
+            hospital_config_paths[hospital_name]
+        )["current_global_model_path"]
         training_result = train_local_model(
             config_path=hospital_config_paths[hospital_name],
-            initial_model_path=distributed_models[hospital_name],
+            initial_model_path=cached_global_model_path,
             local_update_path=get_hospital_round_transfer_paths(
                 hospital_config_paths[hospital_name], round_name
             )["local_update_path"],
@@ -801,7 +1230,17 @@ def run_full_federated_round(
             f"{hospital_name} local update received via LTX at: {update_paths['received_path']}",
         )
 
-    _emit(progress_callback, f"[8/8] Saving the new global model version for {round_name}...")
+    _emit(
+        progress_callback,
+        f"[8/8] Saving the new global model version and redistributing it to the hospital caches for {round_name}...",
+    )
+    redistributed_models = distribute_global_model_to_hospitals(
+        hospital_config_paths=hospital_config_paths,
+        global_model_path=Path(aggregation_result["latest_model_path"]),
+        round_name=round_name,
+    )
+    for hospital_name, redistributed_path in redistributed_models.items():
+        _emit(progress_callback, f"{hospital_name} refreshed global model cached at: {redistributed_path}")
     _emit(progress_callback, f"New versioned global model: {aggregation_result['global_model_path']}")
     _emit(progress_callback, f"Latest global model refreshed: {aggregation_result['latest_model_path']}")
 
@@ -813,25 +1252,46 @@ def run_full_federated_round(
         "round_name": round_name,
         "round_number": round_number,
         "starting_global_model": current_global_model_path,
+        "starting_global_round_name": current_global_round_name,
         "new_global_model": aggregation_result["global_model_path"],
         "latest_global_model": aggregation_result["latest_model_path"],
     }
     for hospital_name in hospital_order:
-        round_log_details[f"{hospital_name.lower()}_distributed_model"] = distributed_models[hospital_name]
+        round_log_details[f"{hospital_name.lower()}_bootstrap_model"] = (
+            bootstrap_models[hospital_name]
+            if hospital_name in bootstrap_models
+            else "Cached local copy reused"
+        )
         round_log_details[f"{hospital_name.lower()}_local_model"] = training_results[hospital_name]["model_path"]
         round_log_details[f"{hospital_name.lower()}_local_update"] = training_results[hospital_name]["local_update_path"]
+        round_log_details[f"{hospital_name.lower()}_refreshed_global_model"] = redistributed_models[hospital_name]
 
     append_log_entry(
         round_log_path,
         title="Full federated round completed",
         details=round_log_details,
     )
+    hospital_update_summaries = _build_hospital_update_summaries(
+        hospital_config_paths=hospital_config_paths,
+        received_updates=aggregation_result["received_updates"],
+    )
+    demo_export_paths = _export_demo_outputs(
+        paths=paths,
+        round_name=round_name,
+        round_number=round_number,
+        current_global_model_path=current_global_model_path,
+        aggregation_result={**aggregation_result, "round_log_path": round_log_path},
+        hospital_summaries=hospital_update_summaries,
+        mode="single-process",
+    )
 
     return {
         "round_number": round_number,
         "round_name": round_name,
         "current_global_model_path": current_global_model_path,
-        "distributed_models": distributed_models,
+        "bootstrap_models": bootstrap_models,
+        "stale_cache_backups": stale_cache_backups,
+        "distributed_models": redistributed_models,
         "hospital_training_results": training_results,
         "received_updates": aggregation_result["received_updates"],
         "global_model_path": aggregation_result["global_model_path"],
@@ -840,4 +1300,8 @@ def run_full_federated_round(
         "round_state_path": aggregation_result["round_state_path"],
         "aggregation_log_path": aggregation_result["aggregation_log_path"],
         "round_log_path": round_log_path,
+        "hospital_update_summaries": hospital_update_summaries,
+        "demo_summary_text_path": demo_export_paths["summary_text_path"],
+        "demo_summary_json_path": demo_export_paths["summary_json_path"],
+        "demo_export_manifest_path": demo_export_paths["export_manifest_path"],
     }

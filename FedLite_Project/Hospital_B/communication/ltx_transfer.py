@@ -9,8 +9,14 @@ from FedLite_Project.Shared_Assets.common_utilities.ltx_hospital_client import (
     receive_global_model_via_ltx as _receive_global_model_via_ltx,
     send_local_update_via_ltx as _send_local_update_via_ltx,
 )
+from FedLite_Project.Shared_Assets.common_utilities.runtime_paths import (
+    resolve_hospital_runtime_paths,
+)
 
-DEFAULT_TRANSFER_CONFIG_PATH = Path(__file__).resolve().parent / "transfer_config.yaml"
+DEFAULT_TRANSFER_CONFIG_PATH = resolve_hospital_runtime_paths(
+    "Hospital_B",
+    Path(__file__),
+).transfer_config_path
 
 
 def receive_global_model_via_ltx(

@@ -49,6 +49,8 @@ Prediction CSV files can omit the `Outcome` column. If it is included, the predi
 
 ## Four-Terminal Startup
 
+For a one-click Windows demo, run `FedLite_Project/Run_Demo_Round.ps1`.
+
 1. Start `Aggregator_Server/server/server_main.py --mode distributed`.
 2. Wait until the aggregator reports that its listeners are ready.
 3. Start `Hospital_A/client/hospital_a_client.py federated-round`.
@@ -56,6 +58,22 @@ Prediction CSV files can omit the `Outcome` column. If it is included, the predi
 5. Start `Hospital_C/client/hospital_c_client.py federated-round`.
 
 The root-level PowerShell helpers in `FedLite_Project/Start_Aggregator.ps1`, `FedLite_Project/Start_Hospital_A.ps1`, `FedLite_Project/Start_Hospital_B.ps1`, and `FedLite_Project/Start_Hospital_C.ps1` wrap those same commands.
+
+After each round, the aggregator also exports a demo-friendly summary into `FedLite_Project/Demo_Outputs/demo_logs/` and a JSON artifact into `FedLite_Project/Demo_Outputs/test_outputs/round_xxx/`.
+
+## Daily Automation
+
+For a once-per-day run such as `12:00 AM`, use `FedLite_Project/Run_Daily_Federated_Round.ps1`.
+
+That script uses the one-process server flow so it can:
+
+1. load the latest global model
+2. simulate hospital training on the same laptop
+3. aggregate the updates
+4. save the new global model
+5. exit automatically
+
+Use `FedLite_Project/Register_Daily_FedLiteCare_Task.ps1` if you want to register a Windows Scheduled Task for daily execution.
 
 ## Desktop GUI
 
@@ -67,9 +85,13 @@ The hospital desktop client can be launched with:
 
 The GUI is a thin Tkinter layer over the existing backend. It reuses local training, prediction, and sync modules rather than replacing them.
 
+For manual patient prediction in the GUI, all patient feature fields should be entered. The prediction tab also includes a built-in example input set and a visible allowed-range guide for quicker demos and safer input entry.
+
 ## Validation And Reports
 
 1. Before any local training run, the dataset is validated for required columns, missing values, and obvious bad rows.
 2. A readable validation report is saved in `Hospital_X/reports/validation/`.
 3. Each single-patient prediction generates a readable report in `Hospital_X/reports/predictions/`.
-4. Training, prediction, and sync activity continue to append to the hospital log files in `Hospital_X/logs/`.
+4. Each single-patient prediction is also appended to `Hospital_X/reports/predictions/patient_prediction_registry.csv` for hospital-side tracking.
+5. Those prediction intake rows should stay separate from training data until a true `Outcome` is confirmed.
+6. Training, prediction, and sync activity continue to append to the hospital log files in `Hospital_X/logs/`.

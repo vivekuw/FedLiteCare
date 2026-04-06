@@ -32,6 +32,17 @@ def main() -> None:
         choices=["distributed", "single-process"],
         help="Choose 'distributed' for the 4-terminal demo or 'single-process' for the old one-terminal flow.",
     )
+    parser.add_argument(
+        "--no-confirm-wait",
+        action="store_true",
+        help="Do not wait for manual Enter confirmation before distributing the global model.",
+    )
+    parser.add_argument(
+        "--startup-delay-seconds",
+        type=int,
+        default=None,
+        help="Optional startup delay before distributing the global model in distributed mode.",
+    )
     args = parser.parse_args()
 
     print("FedLiteCare Local Federated Learning Simulation")
@@ -39,7 +50,12 @@ def main() -> None:
     print("------------------------------------------------")
     if args.mode == "distributed":
         print("Mode: distributed 4-terminal demo")
-        result = run_distributed_federated_round(config_path=args.config, progress_callback=print)
+        result = run_distributed_federated_round(
+            config_path=args.config,
+            progress_callback=print,
+            wait_for_hospital_confirmation=False if args.no_confirm_wait else None,
+            startup_delay_seconds=args.startup_delay_seconds,
+        )
     else:
         print("Mode: single-process fallback")
         result = run_full_federated_round(config_path=args.config, progress_callback=print)
@@ -62,6 +78,18 @@ def main() -> None:
         print(f"Aggregator runtime log updated: {result['node_log_path']}")
     print(f"Aggregator log updated: {result['aggregation_log_path']}")
     print(f"Round log updated: {result['round_log_path']}")
+    print("Hospital validation summary:")
+    for hospital_name, hospital_summary in result["hospital_update_summaries"].items():
+        accuracy = hospital_summary["validation_accuracy"]
+        accuracy_text = "N/A" if accuracy is None else f"{accuracy:.4f}"
+        loss = hospital_summary["validation_loss"]
+        loss_text = "N/A" if loss is None else f"{loss:.4f}"
+        print(
+            f"{hospital_name}: status={hospital_summary['validation_status']} | "
+            f"accuracy={accuracy_text} | loss={loss_text}"
+        )
+    print(f"Demo summary text exported to: {result['demo_summary_text_path']}")
+    print(f"Demo summary JSON exported to: {result['demo_summary_json_path']}")
 
 
 if __name__ == "__main__":

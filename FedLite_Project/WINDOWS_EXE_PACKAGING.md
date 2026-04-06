@@ -61,7 +61,7 @@ This keeps datasets, models, logs, reports, and sync artifacts writable after pa
 - Hospital A GUI is now prepared for EXE-style runtime path resolution.
 - Hospital B, Hospital C, and Aggregator entry points still use more source-oriented launch patterns and should get the same cleanup before packaging those nodes.
 - The active runtime folders are `uploads`, `models`, `logs`, `reports`, and `communication`.
-- Legacy placeholder folders such as `uploaded_data` and `local_model_storage` are not part of the active desktop client flow.
+- Older placeholder folders were removed because the active desktop client flow now uses `uploads`, `models`, `reports`, and `communication`.
 
 ## Suggested Later PyInstaller Direction
 

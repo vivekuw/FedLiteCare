@@ -1,3 +1,3 @@
 # Demo Logs
 
-Placeholder directory for future demo session logs.
+This folder now receives readable per-round demo summaries, such as `round_001_demo_summary.txt`.

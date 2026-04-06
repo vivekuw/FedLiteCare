@@ -7,7 +7,10 @@ local_updates_dir: communication/local_model_updates
 reports_dir: reports
 validation_reports_dir: reports/validation
 prediction_reports_dir: reports/predictions
-dataset_filename: hospital_c_diabetes.csv
+prediction_registry_dir: reports/predictions
+prediction_registry_filename: patient_prediction_registry.csv
+predicted_patients_filename: predicted_patients.csv
+dataset_filename: NODE_C_100.csv
 model_filename: hospital_c_diabetes_classifier.pt
 training_log_filename: training.log
 prediction_log_filename: prediction.log

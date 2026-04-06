@@ -15,7 +15,14 @@ from FedLite_Project.Shared_Assets.common_utilities.hospital_quality_reports imp
     read_labeled_report_value,
 )
 from FedLite_Project.Shared_Assets.common_utilities.local_ml_pipeline import load_hospital_context
-from FedLite_Project.Shared_Assets.data_preprocessing_helpers.preprocessing_utils import load_csv_records
+from FedLite_Project.Shared_Assets.common_utilities.patient_input_rules import (
+    build_range_guide_text,
+    get_patient_input_rules,
+)
+from FedLite_Project.Shared_Assets.data_preprocessing_helpers.preprocessing_utils import (
+    infer_feature_columns,
+    load_csv_records,
+)
 from FedLite_Project.Shared_Assets.shared_model_helpers.model_helpers import load_checkpoint
 
 DEFAULT_FEATURE_COLUMNS = [
@@ -28,6 +35,61 @@ DEFAULT_FEATURE_COLUMNS = [
     "DiabetesPedigreeFunction",
     "Age",
 ]
+
+DEFAULT_EXAMPLE_PATIENT_VALUES = {
+    "Pregnancies": "2",
+    "Glucose": "138",
+    "BloodPressure": "72",
+    "SkinThickness": "35",
+    "Insulin": "0",
+    "BMI": "33.6",
+    "DiabetesPedigreeFunction": "0.627",
+    "Age": "47",
+}
+DEFAULT_EXAMPLE_PATIENT_DETAILS = {
+    "first_name": "Anita",
+    "last_name": "Sharma",
+    "gender": "Female",
+    "date_of_birth": "1979-08-14",
+    "contact_number": "9876543210",
+    "department": "General Medicine",
+    "attending_doctor": "Dr. Mehta",
+    "address": "Ward 4, City Care Block",
+    "visit_notes": "Routine diabetes screening follow-up",
+}
+
+
+def _format_bytes(num_bytes: int | None) -> str:
+    if not num_bytes:
+        return "N/A"
+
+    value = float(num_bytes)
+    for unit in ("B", "KB", "MB", "GB"):
+        if value < 1024 or unit == "GB":
+            return f"{value:.1f} {unit}"
+        value /= 1024
+    return f"{value:.1f} GB"
+
+
+def _find_latest_file(directory: Path, pattern: str) -> Path | None:
+    if not directory.exists():
+        return None
+
+    matching_files = [
+        file_path
+        for file_path in directory.glob(pattern)
+        if file_path.is_file()
+    ]
+    if not matching_files:
+        return None
+    return max(matching_files, key=lambda file_path: file_path.stat().st_mtime)
+
+
+def _resolve_node_label(hospital_name: str) -> str:
+    if "_" not in hospital_name:
+        return hospital_name
+    suffix = hospital_name.split("_", 1)[1].strip()
+    return f"Node {suffix}" if suffix else hospital_name
 
 
 def list_available_dataset_files(config_path: Path) -> list[str]:
@@ -82,9 +144,43 @@ def get_feature_columns_for_hospital(config_path: Path) -> list[str]:
     if dataset_path.exists():
         records = load_csv_records(dataset_path)
         target_column = str(settings.get("target_column", "Outcome"))
-        return [column for column in records[0].keys() if column != target_column]
+        return infer_feature_columns(records, target_column)
 
     return list(DEFAULT_FEATURE_COLUMNS)
+
+
+def get_example_patient_values_for_hospital(config_path: Path) -> dict[str, str]:
+    """Return a simple example patient payload for the prediction form."""
+    feature_columns = get_feature_columns_for_hospital(config_path)
+    return {
+        column: DEFAULT_EXAMPLE_PATIENT_VALUES.get(column, "0")
+        for column in feature_columns
+    }
+
+
+def get_example_patient_details() -> dict[str, str]:
+    """Return a simple patient-detail example for the hospital intake form."""
+    return dict(DEFAULT_EXAMPLE_PATIENT_DETAILS)
+
+
+def format_example_patient_values(example_values: dict[str, str]) -> str:
+    """Render example patient values for compact GUI display."""
+    return " | ".join(
+        f"{column}={value}"
+        for column, value in example_values.items()
+    )
+
+
+def get_prediction_range_guide_for_hospital(config_path: Path) -> str:
+    """Return a readable manual-prediction range guide for GUI display."""
+    feature_columns = get_feature_columns_for_hospital(config_path)
+    return build_range_guide_text(feature_columns)
+
+
+def get_prediction_input_rules_for_hospital(config_path: Path) -> dict[str, dict[str, Any]]:
+    """Return the supported manual-prediction rules for the current hospital model."""
+    feature_columns = get_feature_columns_for_hospital(config_path)
+    return get_patient_input_rules(feature_columns)
 
 
 def _resolve_local_model_version(checkpoint: dict[str, Any] | None, model_path: Path) -> str:
@@ -158,4 +254,47 @@ def get_hospital_dashboard_status(config_path: Path) -> dict[str, Any]:
         "latest_validation_status": latest_validation_status,
         "latest_prediction_report": latest_prediction_report,
         "logs": logs,
+    }
+
+
+def get_research_node_status(config_path: Path) -> dict[str, Any]:
+    """Build a research-demo summary for the simplified node GUI."""
+    dashboard_status = get_hospital_dashboard_status(config_path)
+    settings, paths = load_hospital_context(config_path)
+    dataset_name = str(settings["dataset_filename"])
+    dataset_path = resolve_path(paths["uploads_dir"], dataset_name)
+    dataset_row_count = None
+    if dataset_path.exists():
+        try:
+            dataset_row_count = len(load_csv_records(dataset_path))
+        except Exception:
+            dataset_row_count = None
+
+    model_path = Path(dashboard_status["model_path"])
+    latest_global_model_path = _find_latest_file(paths["received_global_models_dir"], "*.pt")
+    latest_local_update_path = _find_latest_file(paths["local_updates_dir"], "*.pt")
+    latest_evaluation_output_path = _find_latest_file(paths["prediction_reports_dir"], "*_predictions_*.csv")
+    latest_text_report_path = _find_latest_file(paths["prediction_reports_dir"], "*.txt")
+
+    return {
+        **dashboard_status,
+        "node_label": _resolve_node_label(str(dashboard_status["hospital_name"])),
+        "dataset_path": dataset_path,
+        "dataset_row_count": dataset_row_count,
+        "dataset_file_count": len(dashboard_status["dataset_files"]),
+        "model_size_text": _format_bytes(model_path.stat().st_size) if model_path.exists() else "N/A",
+        "latest_global_model_path": latest_global_model_path,
+        "latest_global_model_size_text": (
+            _format_bytes(latest_global_model_path.stat().st_size)
+            if latest_global_model_path is not None
+            else "N/A"
+        ),
+        "latest_local_update_path": latest_local_update_path,
+        "latest_local_update_size_text": (
+            _format_bytes(latest_local_update_path.stat().st_size)
+            if latest_local_update_path is not None
+            else "N/A"
+        ),
+        "latest_evaluation_output_path": latest_evaluation_output_path,
+        "latest_text_report_path": latest_text_report_path,
     }

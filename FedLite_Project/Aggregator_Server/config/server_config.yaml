@@ -8,6 +8,8 @@ round_state_filename: round_state.json
 aggregation_log_filename: aggregator.log
 round_log_filename: round_log.log
 node_log_filename: aggregator_runtime.log
+wait_for_hospital_confirmation: true
+distributed_startup_delay_seconds: 0
 hospital_a_config_path: ../Hospital_A/config/client_config.yaml
 hospital_b_config_path: ../Hospital_B/config/client_config.yaml
 hospital_c_config_path: ../Hospital_C/config/client_config.yaml

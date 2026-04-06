@@ -48,6 +48,8 @@ The recommended 4-terminal demo flow is documented in `RUN_GUIDE.md`.
 - Predict with Hospital C default data: `python FedLite_Project/Hospital_C/prediction/predict_diabetes.py`
 - Predict with a shared sample input: `python FedLite_Project/Hospital_A/prediction/predict_diabetes.py --input FedLite_Project/Datasets/test_input_samples/diabetes_prediction_sample.csv`
 - Run one 4-terminal federated round from the aggregator: `python FedLite_Project/Aggregator_Server/server/server_main.py --mode distributed`
+- Run one-click 4-terminal demo on Windows: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Run_Demo_Round.ps1`
+- Run one daily one-shot round for midnight scheduling: `powershell -ExecutionPolicy Bypass -File FedLite_Project/Run_Daily_Federated_Round.ps1`
 - Run the old one-terminal fallback flow: `python FedLite_Project/Aggregator_Server/server/server_main.py --mode single-process`
 
 ## Desktop GUI
@@ -59,11 +61,23 @@ The recommended 4-terminal demo flow is documented in `RUN_GUIDE.md`.
 
 The Tkinter hospital client includes dashboard, dataset upload, local training, single-patient prediction, aggregator sync, and log/status tabs while reusing the existing backend modules.
 
+The Predict Patient Risk tab now expects all patient fields to be filled for manual prediction, includes a built-in example input loader, and enforces safe demo ranges before prediction.
+
 Windows EXE preparation notes for the Hospital A client are documented in `WINDOWS_EXE_PACKAGING.md`.
+
+Daily automation notes for midnight training are documented in `Documentation/daily_automation_notes.md`.
+
+## Demo Exports
+
+- Each completed federated round now exports a readable summary into `Demo_Outputs/demo_logs/`.
+- A machine-readable JSON artifact for each round is written into `Demo_Outputs/test_outputs/round_xxx/`.
+- The aggregator console also prints a short hospital validation summary after each round.
 
 ## Practical Hospital Utilities
 
 - Dataset validation runs before training and saves readable reports in `Hospital_X/reports/validation/`.
 - Single-patient predictions create readable reports in `Hospital_X/reports/predictions/`.
+- Single-patient predictions are also appended to a separate hospital CSV registry in `Hospital_X/reports/predictions/patient_prediction_registry.csv`.
+- Those prediction intake rows are not used for training automatically; they must be reviewed and given a confirmed `Outcome` first.
 - Hospital client commands also support manual validation with `validate-dataset`.
 - Training, sync, and prediction logs remain under each hospital's `logs/` folder for demo-friendly screenshots.
