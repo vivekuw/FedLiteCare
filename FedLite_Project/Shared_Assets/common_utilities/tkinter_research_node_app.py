@@ -13,6 +13,9 @@ from typing import Any, Callable
 from FedLite_Project.Shared_Assets.common_utilities.federated_hospital_node import run_hospital_federated_round
 from FedLite_Project.Shared_Assets.common_utilities.hospital_gui_support import (
     copy_dataset_into_uploads,
+    get_example_patient_values_for_hospital,
+    get_feature_columns_for_hospital,
+    get_prediction_range_guide_for_hospital,
     get_research_node_status,
     list_available_dataset_files,
     read_recent_log_lines,
@@ -21,6 +24,7 @@ from FedLite_Project.Shared_Assets.common_utilities.hospital_quality_reports imp
 from FedLite_Project.Shared_Assets.common_utilities.local_ml_pipeline import (
     load_hospital_context,
     predict_from_csv,
+    predict_from_patient_values,
     train_local_model,
 )
 from FedLite_Project.Shared_Assets.data_preprocessing_helpers.preprocessing_utils import load_csv_records
@@ -47,6 +51,9 @@ class ResearchNodeApp(tk.Tk):
         self.receive_global_model_callable = receive_global_model_callable
         self.send_local_update_callable = send_local_update_callable
         self.node_status = get_research_node_status(self.config_path)
+        self.feature_columns = get_feature_columns_for_hospital(self.config_path)
+        self.example_patient_values = get_example_patient_values_for_hospital(self.config_path)
+        self.prediction_range_guide = get_prediction_range_guide_for_hospital(self.config_path)
         self.selected_upload_path: Path | None = None
         self.is_busy = False
         self.busy_widgets: list[ttk.Widget] = []
@@ -76,11 +83,27 @@ class ResearchNodeApp(tk.Tk):
         self.validation_report_var = tk.StringVar(value=self._format_path_label(self.node_status["latest_validation_report"]))
         self.training_status_var = tk.StringVar(value="No local adaptation run yet")
         self.sync_status_var = tk.StringVar(value="No round synchronization yet")
+        self.predict_status_var = tk.StringVar(value="No global-model prediction run yet")
+        self.predict_confidence_var = tk.StringVar(value="Confidence: N/A")
+        self.predict_model_var = tk.StringVar(value="Model source: N/A")
+        self.predict_report_var = tk.StringVar(value="Prediction report: N/A")
         self.evaluation_status_var = tk.StringVar(value="No batch evaluation run yet")
         self.evaluation_output_var = tk.StringVar(value=self._format_path_label(self.node_status["latest_evaluation_output_path"]))
         self.upload_status_var = tk.StringVar(value="No dataset file selected")
         self.upload_path_var = tk.StringVar(value="")
         self.log_choice_var = tk.StringVar(value="training")
+        self.range_guide_var = tk.StringVar(value="Allowed ranges:\n" + self.prediction_range_guide)
+        self.example_input_var = tk.StringVar(
+            value="Example input: "
+            + " | ".join(
+                f"{column}={value}"
+                for column, value in self.example_patient_values.items()
+            )
+        )
+        self.field_vars = {
+            column: tk.StringVar(value="")
+            for column in self.feature_columns
+        }
 
         self._configure_style()
         self._build_layout()
@@ -117,15 +140,18 @@ class ResearchNodeApp(tk.Tk):
         self.overview_tab = ttk.Frame(notebook, padding=12)
         self.node_status_tab = ttk.Frame(notebook, padding=12)
         self.run_round_tab = ttk.Frame(notebook, padding=12)
+        self.predict_tab = ttk.Frame(notebook, padding=12)
         self.results_tab = ttk.Frame(notebook, padding=12)
         notebook.add(self.overview_tab, text="Overview")
         notebook.add(self.node_status_tab, text="Node Status")
         notebook.add(self.run_round_tab, text="Run Round")
+        notebook.add(self.predict_tab, text="Predict")
         notebook.add(self.results_tab, text="Results")
 
         self._build_overview_tab()
         self._build_node_status_tab()
         self._build_run_round_tab()
+        self._build_predict_tab()
         self._build_results_tab()
 
         footer = ttk.Frame(container, padding=(0, 8, 0, 0))
@@ -282,6 +308,83 @@ class ResearchNodeApp(tk.Tk):
             justify="left",
         ).pack(anchor="w", pady=(14, 0))
 
+    def _build_predict_tab(self) -> None:
+        ttk.Label(
+            self.predict_tab,
+            text=(
+                "Run a single manual prediction using the latest cached global model on this node. "
+                "This does not use CSV input."
+            ),
+            wraplength=920,
+            justify="left",
+        ).pack(anchor="w")
+
+        example_frame = ttk.LabelFrame(self.predict_tab, text="Quick Example", padding=12)
+        example_frame.pack(fill="x", pady=(16, 0))
+        ttk.Label(
+            example_frame,
+            textvariable=self.example_input_var,
+            wraplength=920,
+            justify="left",
+        ).pack(anchor="w")
+
+        range_frame = ttk.LabelFrame(self.predict_tab, text="Field Guide", padding=12)
+        range_frame.pack(fill="x", pady=(12, 0))
+        ttk.Label(
+            range_frame,
+            textvariable=self.range_guide_var,
+            wraplength=920,
+            justify="left",
+        ).pack(anchor="w")
+
+        form = ttk.LabelFrame(self.predict_tab, text="Prediction Inputs", padding=12)
+        form.pack(fill="x", pady=(12, 0))
+        for index, column in enumerate(self.feature_columns):
+            row = index // 2
+            column_position = (index % 2) * 2
+            ttk.Label(form, text=column).grid(
+                row=row,
+                column=column_position,
+                sticky="w",
+                padx=(0, 8),
+                pady=6,
+            )
+            ttk.Entry(form, textvariable=self.field_vars[column], width=22).grid(
+                row=row,
+                column=column_position + 1,
+                sticky="w",
+                pady=6,
+            )
+
+        actions = ttk.Frame(self.predict_tab)
+        actions.pack(fill="x", pady=(16, 0))
+        predict_button = ttk.Button(
+            actions,
+            text="Predict Using Latest Global Model",
+            command=self.predict_with_latest_global_model,
+        )
+        predict_button.pack(side="left")
+        example_button = ttk.Button(
+            actions,
+            text="Load Example Input",
+            command=self.load_example_patient_values,
+        )
+        example_button.pack(side="left", padx=(8, 0))
+        clear_button = ttk.Button(
+            actions,
+            text="Clear Inputs",
+            command=self.clear_prediction_fields,
+        )
+        clear_button.pack(side="left", padx=(8, 0))
+        self.busy_widgets.extend([predict_button, example_button, clear_button])
+
+        result_frame = ttk.LabelFrame(self.predict_tab, text="Prediction Result", padding=12)
+        result_frame.pack(fill="x", pady=(16, 0))
+        self._add_status_row(result_frame, 0, "Status", self.predict_status_var)
+        self._add_status_row(result_frame, 1, "Confidence", self.predict_confidence_var)
+        self._add_status_row(result_frame, 2, "Model Source", self.predict_model_var)
+        self._add_status_row(result_frame, 3, "Prediction Report", self.predict_report_var)
+
     def _build_results_tab(self) -> None:
         ttk.Label(
             self.results_tab,
@@ -410,6 +513,24 @@ class ResearchNodeApp(tk.Tk):
                 ),
             )
             return
+        if task_name == "Predict Using Latest Global Model":
+            self.predict_status_var.set(payload["result_label"])
+            self.predict_confidence_var.set(f"Confidence: {payload['confidence_score']:.4f}")
+            self.predict_model_var.set(
+                f"Model source: Latest global model ({payload['model_path'].name})"
+            )
+            self.predict_report_var.set(
+                f"Prediction report: {payload['report_path'].name}"
+            )
+            messagebox.showinfo(
+                "Global Model Prediction Complete",
+                (
+                    f"Result: {payload['result_label']}\n"
+                    f"Confidence: {payload['confidence_score']:.4f}\n"
+                    f"Model: {payload['model_path']}"
+                ),
+            )
+            return
         if task_name == "Run Batch Evaluation":
             positive_predictions = sum(row["predicted_label"] for row in payload["predictions"])
             accuracy_text = "Accuracy: N/A" if payload["accuracy"] is None else f"Accuracy: {payload['accuracy']:.4f}"
@@ -430,6 +551,10 @@ class ResearchNodeApp(tk.Tk):
             self.training_status_var.set("Local adaptation failed")
         if task_name == "Run Full Sync Round":
             self.sync_status_var.set("Round synchronization failed")
+        if task_name == "Predict Using Latest Global Model":
+            self.predict_status_var.set("Global-model prediction failed")
+            self.predict_confidence_var.set("Confidence: N/A")
+            self.predict_model_var.set("Model source: N/A")
         if task_name == "Run Batch Evaluation":
             self.evaluation_status_var.set("Batch evaluation failed")
         messagebox.showerror(task_name, str(error))
@@ -547,6 +672,45 @@ class ResearchNodeApp(tk.Tk):
         self._run_background_task(
             "Run Batch Evaluation",
             lambda: predict_from_csv(config_path=self.config_path, input_path=input_path),
+        )
+
+    def clear_prediction_fields(self) -> None:
+        for variable in self.field_vars.values():
+            variable.set("")
+        self.predict_status_var.set("No global-model prediction run yet")
+        self.predict_confidence_var.set("Confidence: N/A")
+        self.predict_model_var.set("Model source: N/A")
+        self.predict_report_var.set("Prediction report: N/A")
+        self.current_status_var.set("Prediction inputs cleared")
+
+    def load_example_patient_values(self) -> None:
+        for column, variable in self.field_vars.items():
+            variable.set(self.example_patient_values.get(column, "0"))
+        self.current_status_var.set("Example prediction input loaded")
+
+    def predict_with_latest_global_model(self) -> None:
+        latest_global_model_path = self.node_status["latest_global_model_path"]
+        if latest_global_model_path is None:
+            messagebox.showwarning(
+                "No Global Model",
+                "No cached global model is available yet. Run one sync round first.",
+            )
+            return
+
+        patient_values = {
+            column: variable.get().strip()
+            for column, variable in self.field_vars.items()
+        }
+        self.predict_status_var.set("Running prediction from latest global model...")
+        self.predict_confidence_var.set("Confidence: calculating...")
+        self.predict_model_var.set(f"Model source: {latest_global_model_path.name}")
+        self._run_background_task(
+            "Predict Using Latest Global Model",
+            lambda: predict_from_patient_values(
+                config_path=self.config_path,
+                patient_values=patient_values,
+                model_path=latest_global_model_path,
+            ),
         )
 
     @staticmethod
