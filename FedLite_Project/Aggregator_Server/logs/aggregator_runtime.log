@@ -1,0 +1,250 @@
+[2026-04-07T18:28:35] Distributed aggregator round started
+round_number: 1
+round_name: round_001
+
+[2026-04-07T18:28:35] Aggregator listeners opened
+round_name: round_001
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_001
+bootstrap_targets: Hospital_A, Hospital_B, Hospital_C
+stale_cache_backups: None
+
+[2026-04-07T18:28:35] Waiting for automatic startup delay
+round_name: round_001
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-07T18:29:05] Bootstrap model distribution completed
+round_name: round_001
+bootstrap_round_name: round_000
+hospital_targets: Hospital_A, Hospital_B, Hospital_C
+stale_cache_backups: None
+
+[2026-04-07T18:29:08] Refreshed global model distribution completed
+round_name: round_001
+hospital_a_bytes_sent: 2795
+hospital_b_bytes_sent: 2795
+hospital_c_bytes_sent: 2795
+
+[2026-04-07T18:29:08] Distributed aggregator round completed
+round_number: 1
+round_name: round_001
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_001_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+[2026-04-07T18:30:06] Distributed aggregator round started
+round_number: 2
+round_name: round_002
+
+[2026-04-07T18:30:06] Aggregator listeners opened
+round_name: round_002
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_002
+bootstrap_targets: None
+stale_cache_backups: None
+
+[2026-04-07T18:30:06] Waiting for automatic startup delay
+round_name: round_002
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-07T18:30:14] Bootstrap model distribution skipped
+round_name: round_002
+reason: all_hospitals_already_cached_latest_global_model
+
+[2026-04-07T18:30:19] Refreshed global model distribution completed
+round_name: round_002
+hospital_a_bytes_sent: 2790
+hospital_b_bytes_sent: 2790
+hospital_c_bytes_sent: 2790
+
+[2026-04-07T18:30:19] Distributed aggregator round completed
+round_number: 2
+round_name: round_002
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_002_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+[2026-04-07T19:19:29] Distributed aggregator round started
+round_number: 3
+round_name: round_003
+
+[2026-04-07T19:19:30] Aggregator listeners opened
+round_name: round_003
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_003
+bootstrap_targets: None
+stale_cache_backups: None
+
+[2026-04-07T19:19:30] Waiting for automatic startup delay
+round_name: round_003
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-07T19:19:38] Bootstrap model distribution skipped
+round_name: round_003
+reason: all_hospitals_already_cached_latest_global_model
+
+[2026-04-07T19:20:59] Refreshed global model distribution completed
+round_name: round_003
+hospital_a_bytes_sent: 2807
+hospital_b_bytes_sent: 2807
+hospital_c_bytes_sent: 2807
+
+[2026-04-07T19:20:59] Distributed aggregator round completed
+round_number: 3
+round_name: round_003
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_003_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+[2026-04-09T16:37:42] Distributed aggregator round started
+round_number: 4
+round_name: round_004
+
+[2026-04-09T16:37:43] Aggregator listeners opened
+round_name: round_004
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_004
+bootstrap_targets: None
+stale_cache_backups: None
+
+[2026-04-09T16:37:43] Waiting for automatic startup delay
+round_name: round_004
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-09T16:37:51] Bootstrap model distribution skipped
+round_name: round_004
+reason: all_hospitals_already_cached_latest_global_model
+
+[2026-04-09T16:37:51] Refreshed global model distribution completed
+round_name: round_004
+hospital_a_bytes_sent: 2808
+hospital_b_bytes_sent: 2808
+hospital_c_bytes_sent: 2808
+
+[2026-04-09T16:37:51] Distributed aggregator round completed
+round_number: 4
+round_name: round_004
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_004_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+[2026-04-10T07:23:27] Distributed aggregator round started
+round_number: 5
+round_name: round_005
+
+[2026-04-10T07:23:27] Aggregator listeners opened
+round_name: round_005
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_005
+bootstrap_targets: None
+stale_cache_backups: None
+
+[2026-04-10T07:23:27] Waiting for automatic startup delay
+round_name: round_005
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-10T07:23:35] Bootstrap model distribution skipped
+round_name: round_005
+reason: all_hospitals_already_cached_latest_global_model
+
+[2026-04-10T07:24:16] Refreshed global model distribution completed
+round_name: round_005
+hospital_a_bytes_sent: 2793
+hospital_b_bytes_sent: 2793
+hospital_c_bytes_sent: 2793
+
+[2026-04-10T07:24:16] Distributed aggregator round completed
+round_number: 5
+round_name: round_005
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_005_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+[2026-04-10T11:32:28] Distributed aggregator round started
+round_number: 6
+round_name: round_006
+
+[2026-04-10T11:32:28] Aggregator listeners opened
+round_name: round_006
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_006
+bootstrap_targets: None
+stale_cache_backups: None
+
+[2026-04-10T11:32:28] Waiting for automatic startup delay
+round_name: round_006
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-10T11:32:36] Bootstrap model distribution skipped
+round_name: round_006
+reason: all_hospitals_already_cached_latest_global_model
+
+[2026-04-10T11:34:10] Refreshed global model distribution completed
+round_name: round_006
+hospital_a_bytes_sent: 2789
+hospital_b_bytes_sent: 2789
+hospital_c_bytes_sent: 2789
+
+[2026-04-10T11:34:10] Distributed aggregator round completed
+round_number: 6
+round_name: round_006
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_006_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+[2026-04-10T12:37:09] Distributed aggregator round started
+round_number: 7
+round_name: round_007
+
+[2026-04-10T12:37:09] Aggregator listeners opened
+round_name: round_007
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_007
+bootstrap_targets: None
+stale_cache_backups: None
+
+[2026-04-10T12:37:09] Waiting for automatic startup delay
+round_name: round_007
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-10T12:37:17] Bootstrap model distribution skipped
+round_name: round_007
+reason: all_hospitals_already_cached_latest_global_model
+
+[2026-04-10T12:38:04] Refreshed global model distribution completed
+round_name: round_007
+hospital_a_bytes_sent: 2794
+hospital_b_bytes_sent: 2794
+hospital_c_bytes_sent: 2794
+
+[2026-04-10T12:38:04] Distributed aggregator round completed
+round_number: 7
+round_name: round_007
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_007_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+[2026-04-10T14:31:52] Distributed aggregator round started
+round_number: 8
+round_name: round_008
+
+[2026-04-10T14:31:53] Aggregator listeners opened
+round_name: round_008
+received_round_dir: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_008
+bootstrap_targets: None
+stale_cache_backups: None
+
+[2026-04-10T14:31:53] Waiting for automatic startup delay
+round_name: round_008
+startup_delay_seconds: 8
+status: delayed_before_distribution
+
+[2026-04-10T14:32:01] Bootstrap model distribution skipped
+round_name: round_008
+reason: all_hospitals_already_cached_latest_global_model
+
+[2026-04-10T14:33:36] Refreshed global model distribution completed
+round_name: round_008
+hospital_a_bytes_sent: 2797
+hospital_b_bytes_sent: 2797
+hospital_c_bytes_sent: 2797
+
+[2026-04-10T14:33:36] Distributed aggregator round completed
+round_number: 8
+round_name: round_008
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_008_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+

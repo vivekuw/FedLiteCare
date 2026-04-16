@@ -1,0 +1,136 @@
+[2026-04-07T18:29:08] Distributed federated round completed
+round_name: round_001
+round_number: 1
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_000
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_001_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_001\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_001\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_001\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+
+[2026-04-07T18:30:19] Distributed federated round completed
+round_name: round_002
+round_number: 2
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_001
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_002_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: Cached local copy reused
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_002\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: Cached local copy reused
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_002\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: Cached local copy reused
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_002\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+
+[2026-04-07T19:20:59] Distributed federated round completed
+round_name: round_003
+round_number: 3
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_002
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_003_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: Cached local copy reused
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_003\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: Cached local copy reused
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_003\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: Cached local copy reused
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_003\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+
+[2026-04-09T16:37:51] Distributed federated round completed
+round_name: round_004
+round_number: 4
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_003
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_004_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: Cached local copy reused
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_004\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: Cached local copy reused
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_004\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: Cached local copy reused
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_004\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+
+[2026-04-10T07:24:16] Distributed federated round completed
+round_name: round_005
+round_number: 5
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_004
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_005_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: Cached local copy reused
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_005\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: Cached local copy reused
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_005\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: Cached local copy reused
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_005\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+
+[2026-04-10T11:34:10] Distributed federated round completed
+round_name: round_006
+round_number: 6
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_005
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_006_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: Cached local copy reused
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_006\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: Cached local copy reused
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_006\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: Cached local copy reused
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_006\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+
+[2026-04-10T12:38:04] Distributed federated round completed
+round_name: round_007
+round_number: 7
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_006
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_007_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: Cached local copy reused
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_007\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: Cached local copy reused
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_007\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: Cached local copy reused
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_007\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+
+[2026-04-10T14:33:36] Distributed federated round completed
+round_name: round_008
+round_number: 8
+starting_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+starting_global_round_name: round_007
+new_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_008_global_model.pt
+latest_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospital_a_bootstrap_model: Cached local copy reused
+hospital_a_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_008\hospital_a_update.pt
+hospital_a_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+hospital_b_bootstrap_model: Cached local copy reused
+hospital_b_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_008\hospital_b_update.pt
+hospital_b_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+hospital_c_bootstrap_model: Cached local copy reused
+hospital_c_received_update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_008\hospital_c_update.pt
+hospital_c_refreshed_global_model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+

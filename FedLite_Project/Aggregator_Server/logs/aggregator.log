@@ -1,0 +1,56 @@
+[2026-04-07T18:29:08] Aggregation round completed
+round_number: 1
+round_name: round_001
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_001_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+
+[2026-04-07T18:30:19] Aggregation round completed
+round_number: 2
+round_name: round_002
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_002_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+
+[2026-04-07T19:20:59] Aggregation round completed
+round_number: 3
+round_name: round_003
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_003_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+
+[2026-04-09T16:37:51] Aggregation round completed
+round_number: 4
+round_name: round_004
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_004_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+
+[2026-04-10T07:24:16] Aggregation round completed
+round_number: 5
+round_name: round_005
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_005_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+
+[2026-04-10T11:34:10] Aggregation round completed
+round_number: 6
+round_name: round_006
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_006_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+
+[2026-04-10T12:38:04] Aggregation round completed
+round_number: 7
+round_name: round_007
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_007_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+
+[2026-04-10T14:33:36] Aggregation round completed
+round_number: 8
+round_name: round_008
+global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_008_global_model.pt
+latest_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+hospitals: Hospital_A, Hospital_B, Hospital_C
+

@@ -1,0 +1,35 @@
+FedLiteCare Dataset Validation Report
+===================================
+
+Hospital ID: Hospital_B
+Generated At: 2026-04-10T14:33:27
+Dataset Path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\uploads\NODE_B_100.csv
+Validation Status: PASS
+Ready For Training: Yes
+Total Rows: 100
+
+Required Columns
+----------------
+Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age, Outcome
+
+Missing Required Columns
+------------------------
+None
+
+Missing Values
+--------------
+None
+
+Rows With Missing Feature Values: 0
+
+Invalid Rows
+------------
+None
+
+Suspicious Rows
+---------------
+None
+
+Recommendation
+--------------
+Dataset looks ready for local training.

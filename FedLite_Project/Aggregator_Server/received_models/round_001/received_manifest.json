@@ -1,0 +1,24 @@
+{
+  "round_name": "round_001",
+  "received_at": "2026-04-07T18:29:08",
+  "hospitals": {
+    "Hospital_A": {
+      "source_path": "round_001_hospital_a_update.pt",
+      "received_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\received_models\\round_001\\hospital_a_update.pt",
+      "bytes_sent": 0,
+      "bytes_received": 4509
+    },
+    "Hospital_B": {
+      "source_path": "round_001_hospital_b_update.pt",
+      "received_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\received_models\\round_001\\hospital_b_update.pt",
+      "bytes_sent": 0,
+      "bytes_received": 4486
+    },
+    "Hospital_C": {
+      "source_path": "round_001_hospital_c_update.pt",
+      "received_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\received_models\\round_001\\hospital_c_update.pt",
+      "bytes_sent": 0,
+      "bytes_received": 4523
+    }
+  }
+}

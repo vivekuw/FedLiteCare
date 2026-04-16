@@ -1,0 +1,355 @@
+[2026-04-07T18:29:02] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-07T18:29:03] Bootstrap global model received
+hospital_name: Hospital_A
+base_round_name: round_000
+base_round_number: 0
+received_bytes: 2683
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+bootstrap_archive_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_000_global_model.pt
+status: received_bootstrap_global_model
+
+[2026-04-07T18:29:06] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_001
+base_round_name: round_000
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_A_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260407_182903_216212.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_001_hospital_a_update.pt
+validation_accuracy: 1.0
+status: training_completed
+
+[2026-04-07T18:29:06] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_001
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_001_hospital_a_update.pt
+bytes_sent: 4509
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-07T18:29:08] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_001
+received_bytes: 2795
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_001_global_model.pt
+status: received_refreshed_global_model
+
+[2026-04-07T18:30:10] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-07T18:30:10] Cached global model located
+hospital_name: Hospital_A
+base_round_name: round_001
+base_round_number: 1
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+status: using_cached_global_model
+
+[2026-04-07T18:30:13] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_002
+base_round_name: round_001
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_A_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260407_183010_165846.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_002_hospital_a_update.pt
+validation_accuracy: 1.0
+status: training_completed
+
+[2026-04-07T18:30:13] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_002
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_002_hospital_a_update.pt
+bytes_sent: 4396
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-07T18:30:19] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_002
+received_bytes: 2790
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_002_global_model.pt
+status: received_refreshed_global_model
+
+[2026-04-07T19:20:53] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-07T19:20:53] Cached global model located
+hospital_name: Hospital_A
+base_round_name: round_002
+base_round_number: 2
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+status: using_cached_global_model
+
+[2026-04-07T19:20:59] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_003
+base_round_name: round_002
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_SET_1_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_SET_1_100_validation_20260407_192053_554424.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_003_hospital_a_update.pt
+validation_accuracy: 0.88
+status: training_completed
+
+[2026-04-07T19:20:59] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_003
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_003_hospital_a_update.pt
+bytes_sent: 4437
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-07T19:20:59] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_003
+received_bytes: 2807
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_003_global_model.pt
+status: received_refreshed_global_model
+
+[2026-04-09T16:37:38] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-09T16:37:38] Cached global model located
+hospital_name: Hospital_A
+base_round_name: round_003
+base_round_number: 3
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+status: using_cached_global_model
+
+[2026-04-09T16:37:42] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_004
+base_round_name: round_003
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_A_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260409_163738_630136.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_004_hospital_a_update.pt
+validation_accuracy: 1.0
+status: training_completed
+
+[2026-04-09T16:37:43] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_004
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_004_hospital_a_update.pt
+bytes_sent: 4378
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-09T16:37:51] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_004
+received_bytes: 2808
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_004_global_model.pt
+status: received_refreshed_global_model
+
+[2026-04-10T07:24:10] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-10T07:24:10] Cached global model located
+hospital_name: Hospital_A
+base_round_name: round_004
+base_round_number: 4
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+status: using_cached_global_model
+
+[2026-04-10T07:24:16] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_005
+base_round_name: round_004
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_A_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260410_072410_924843.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_005_hospital_a_update.pt
+validation_accuracy: 1.0
+status: training_completed
+
+[2026-04-10T07:24:16] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_005
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_005_hospital_a_update.pt
+bytes_sent: 4371
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-10T07:24:16] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_005
+received_bytes: 2793
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_005_global_model.pt
+status: received_refreshed_global_model
+
+[2026-04-10T11:34:04] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-10T11:34:04] Cached global model located
+hospital_name: Hospital_A
+base_round_name: round_005
+base_round_number: 5
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+status: using_cached_global_model
+
+[2026-04-10T11:34:10] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_006
+base_round_name: round_005
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_A_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260410_113404_420258.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_006_hospital_a_update.pt
+validation_accuracy: 1.0
+status: training_completed
+
+[2026-04-10T11:34:10] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_006
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_006_hospital_a_update.pt
+bytes_sent: 4331
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-10T11:34:10] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_006
+received_bytes: 2789
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_006_global_model.pt
+status: received_refreshed_global_model
+
+[2026-04-10T12:37:58] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-10T12:37:58] Cached global model located
+hospital_name: Hospital_A
+base_round_name: round_006
+base_round_number: 6
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+status: using_cached_global_model
+
+[2026-04-10T12:38:04] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_007
+base_round_name: round_006
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_A_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260410_123758_467328.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_007_hospital_a_update.pt
+validation_accuracy: 1.0
+status: training_completed
+
+[2026-04-10T12:38:04] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_007
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_007_hospital_a_update.pt
+bytes_sent: 4352
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-10T12:38:04] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_007
+received_bytes: 2794
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_007_global_model.pt
+status: received_refreshed_global_model
+
+[2026-04-10T14:33:20] Hospital federated node started
+hospital_name: Hospital_A
+config_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\config\client_config.yaml
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+status: started
+
+[2026-04-10T14:33:20] Cached global model located
+hospital_name: Hospital_A
+base_round_name: round_007
+base_round_number: 7
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+status: using_cached_global_model
+
+[2026-04-10T14:33:24] Local training completed for federated round
+hospital_name: Hospital_A
+round_name: round_008
+base_round_name: round_007
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\uploads\NODE_A_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260410_143320_821729.txt
+local_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_008_hospital_a_update.pt
+validation_accuracy: 1.0
+status: training_completed
+
+[2026-04-10T14:33:25] Local update sent for federated round
+hospital_name: Hospital_A
+round_name: round_008
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_008_hospital_a_update.pt
+bytes_sent: 4366
+target_host: 127.0.0.1
+target_port: 9201
+status: completed
+
+[2026-04-10T14:33:36] Refreshed global model received
+hospital_name: Hospital_A
+round_name: round_008
+received_bytes: 2797
+staging_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+current_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+round_global_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\round_008_global_model.pt
+status: received_refreshed_global_model
+

@@ -1,0 +1,272 @@
+[2026-04-07T18:29:02] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: pending
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-07T18:29:03] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_000
+sender_address: 127.0.0.1
+sender_port: 13870
+received_bytes: 2683
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-07T18:29:06] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_001
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_001_hospital_a_update.pt
+
+[2026-04-07T18:29:06] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_001
+bytes_sent: 4509
+file_size: 4509
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_001_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-07T18:29:06] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_001
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-07T18:29:08] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_001
+sender_address: 127.0.0.1
+sender_port: 4937
+received_bytes: 2795
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-07T18:30:13] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_002
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_002_hospital_a_update.pt
+
+[2026-04-07T18:30:13] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_002
+bytes_sent: 4396
+file_size: 4396
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_002_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-07T18:30:13] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_002
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-07T18:30:19] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_002
+sender_address: 127.0.0.1
+sender_port: 3947
+received_bytes: 2790
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-07T19:20:59] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_003
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_003_hospital_a_update.pt
+
+[2026-04-07T19:20:59] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_003
+bytes_sent: 4437
+file_size: 4437
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_003_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-07T19:20:59] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_003
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-07T19:20:59] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_003
+sender_address: 127.0.0.1
+sender_port: 12297
+received_bytes: 2807
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-09T16:37:42] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_004
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_004_hospital_a_update.pt
+
+[2026-04-09T16:37:43] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_004
+bytes_sent: 4378
+file_size: 4378
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_004_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-09T16:37:43] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_004
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-09T16:37:51] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_004
+sender_address: 127.0.0.1
+sender_port: 7228
+received_bytes: 2808
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-10T07:24:16] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_005
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_005_hospital_a_update.pt
+
+[2026-04-10T07:24:16] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_005
+bytes_sent: 4371
+file_size: 4371
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_005_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-10T07:24:16] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_005
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-10T07:24:16] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_005
+sender_address: 127.0.0.1
+sender_port: 13742
+received_bytes: 2793
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-10T11:34:10] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_006
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_006_hospital_a_update.pt
+
+[2026-04-10T11:34:10] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_006
+bytes_sent: 4331
+file_size: 4331
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_006_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-10T11:34:10] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_006
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-10T11:34:10] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_006
+sender_address: 127.0.0.1
+sender_port: 5230
+received_bytes: 2789
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-10T12:38:04] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_007
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_007_hospital_a_update.pt
+
+[2026-04-10T12:38:04] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_007
+bytes_sent: 4352
+file_size: 4352
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_007_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-10T12:38:04] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_007
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-10T12:38:04] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_007
+sender_address: 127.0.0.1
+sender_port: 2099
+received_bytes: 2794
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+
+[2026-04-10T14:33:24] Sending local update via LTX
+hospital_name: Hospital_A
+round_name: round_008
+target_host: 127.0.0.1
+target_port: 9201
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_008_hospital_a_update.pt
+
+[2026-04-10T14:33:25] Local update sent via LTX
+hospital_name: Hospital_A
+round_name: round_008
+bytes_sent: 4366
+file_size: 4366
+source_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\local_model_updates\round_008_hospital_a_update.pt
+target_host: 127.0.0.1
+target_port: 9201
+
+[2026-04-10T14:33:25] Receiving global model via LTX
+hospital_name: Hospital_A
+round_name: round_008
+bind_host: 127.0.0.1
+bind_port: 9101
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+
+[2026-04-10T14:33:36] Global model received via LTX
+hospital_name: Hospital_A
+round_name: round_008
+sender_address: 127.0.0.1
+sender_port: 14618
+received_bytes: 2797
+destination_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\incoming_global_model.pt
+file_name: global_model_latest.pt
+

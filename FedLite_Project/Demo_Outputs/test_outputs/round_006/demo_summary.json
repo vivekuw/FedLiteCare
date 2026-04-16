@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-04-10T11:34:10",
+  "round_name": "round_006",
+  "round_number": 6,
+  "mode": "distributed",
+  "starting_global_model": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\saved_global_model_versions\\global_model_latest.pt",
+  "new_global_model": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\saved_global_model_versions\\round_006_global_model.pt",
+  "latest_global_model": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\saved_global_model_versions\\global_model_latest.pt",
+  "version_history_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\saved_global_model_versions\\version_history.json",
+  "round_state_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\round_state.json",
+  "aggregator_runtime_log": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\logs\\aggregator_runtime.log",
+  "aggregator_log": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\logs\\aggregator.log",
+  "round_log": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\logs\\round_log.log",
+  "hospital_order": [
+    "Hospital_A",
+    "Hospital_B",
+    "Hospital_C"
+  ],
+  "hospitals": {
+    "Hospital_A": {
+      "hospital_name": "Hospital_A",
+      "dataset_filename": "NODE_A_100.csv",
+      "dataset_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_A\\uploads\\NODE_A_100.csv",
+      "local_model_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_A\\models\\hospital_a_diabetes_classifier.pt",
+      "received_update_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\received_models\\round_006\\hospital_a_update.pt",
+      "validation_report_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_A\\reports\\validation\\NODE_A_100_validation_20260410_113404_420258.txt",
+      "validation_status": "PASS",
+      "validation_accuracy": 1.0,
+      "validation_loss": 0.00041782885789871216,
+      "bytes_sent": 0,
+      "bytes_received": 4331,
+      "checkpoint_round_name": "round_006"
+    },
+    "Hospital_B": {
+      "hospital_name": "Hospital_B",
+      "dataset_filename": "NODE_B_100.csv",
+      "dataset_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_B\\uploads\\NODE_B_100.csv",
+      "local_model_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_B\\models\\hospital_b_diabetes_classifier.pt",
+      "received_update_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\received_models\\round_006\\hospital_b_update.pt",
+      "validation_report_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_B\\reports\\validation\\NODE_B_100_validation_20260410_113355_353844.txt",
+      "validation_status": "PASS",
+      "validation_accuracy": 1.0,
+      "validation_loss": 0.0004572027176618576,
+      "bytes_sent": 0,
+      "bytes_received": 4351,
+      "checkpoint_round_name": "round_006"
+    },
+    "Hospital_C": {
+      "hospital_name": "Hospital_C",
+      "dataset_filename": "NODE_C_100.csv",
+      "dataset_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_C\\uploads\\NODE_C_100.csv",
+      "local_model_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_C\\models\\hospital_c_diabetes_classifier.pt",
+      "received_update_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Aggregator_Server\\received_models\\round_006\\hospital_c_update.pt",
+      "validation_report_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Hospital_C\\reports\\validation\\NODE_C_100_validation_20260410_113402_530761.txt",
+      "validation_status": "PASS",
+      "validation_accuracy": 1.0,
+      "validation_loss": 0.00048039902932941916,
+      "bytes_sent": 0,
+      "bytes_received": 4375,
+      "checkpoint_round_name": "round_006"
+    }
+  },
+  "summary_text_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Demo_Outputs\\demo_logs\\round_006_demo_summary.txt",
+  "summary_json_path": "C:\\Users\\Vivek wadher\\OneDrive\\Desktop\\Documents\\New project\\FedLite_Project\\Demo_Outputs\\test_outputs\\round_006\\demo_summary.json",
+  "exported_at": "2026-04-10T11:34:10"
+}

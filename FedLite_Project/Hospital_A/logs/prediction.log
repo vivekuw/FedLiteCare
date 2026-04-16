@@ -1,0 +1,51 @@
+[2026-04-10T11:34:34] Single-patient prediction
+hospital_name: Hospital_A
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+patient_case_id: CASE-20260410-113434
+probability: 0.999526
+predicted_label: 1
+status: completed
+
+[2026-04-10T11:34:34] Prediction report generated
+hospital_name: Hospital_A
+patient_case_id: CASE-20260410-113434
+report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\patient_prediction_20260410_113434_975631.txt
+prediction_registry_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\patient_prediction_registry.csv
+predicted_patients_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\predicted_patients.csv
+result_label: High diabetes risk
+confidence_score: 0.999526
+
+[2026-04-10T12:09:47] Single-patient prediction
+hospital_name: Hospital_A
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+patient_case_id: CASE-20260410-120947
+probability: 0.999526
+predicted_label: 1
+status: completed
+
+[2026-04-10T12:09:47] Prediction report generated
+hospital_name: Hospital_A
+patient_case_id: CASE-20260410-120947
+report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\patient_prediction_20260410_120947_969549.txt
+prediction_registry_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\patient_prediction_registry.csv
+predicted_patients_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\predicted_patients.csv
+result_label: High diabetes risk
+confidence_score: 0.999526
+
+[2026-04-10T14:34:18] Single-patient prediction
+hospital_name: Hospital_A
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\communication\received_global_models\current_global_model.pt
+patient_case_id: CASE-20260410-143418
+probability: 0.999807
+predicted_label: 1
+status: completed
+
+[2026-04-10T14:34:18] Prediction report generated
+hospital_name: Hospital_A
+patient_case_id: CASE-20260410-143418
+report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\patient_prediction_20260410_143418_779771.txt
+prediction_registry_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\patient_prediction_registry.csv
+predicted_patients_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\predictions\predicted_patients.csv
+result_label: High diabetes risk
+confidence_score: 0.999807
+

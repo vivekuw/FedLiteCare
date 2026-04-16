@@ -1,0 +1,390 @@
+[2026-04-07T18:28:46] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260407_182846_618626.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-07T18:28:51] Training completed
+hospital_name: Hospital_C
+round_name: standalone
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260407_182846_618626.txt
+initial_model_path: None
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: None
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.019735
+validation_accuracy: 1.0
+
+[2026-04-07T18:29:05] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260407_182905_247731.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-07T18:29:08] Training completed
+hospital_name: Hospital_C
+round_name: round_001
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260407_182905_247731.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_001_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.022071
+validation_accuracy: 1.0
+
+[2026-04-07T18:30:12] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260407_183012_522100.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-07T18:30:16] Training completed
+hospital_name: Hospital_C
+round_name: round_002
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260407_183012_522100.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_002_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.002585
+validation_accuracy: 1.0
+
+[2026-04-07T19:20:32] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_SET_3_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_SET_3_100_validation_20260407_192032_614183.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-07T19:20:43] Training completed
+hospital_name: Hospital_C
+round_name: standalone
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_SET_3_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_SET_3_100_validation_20260407_192032_614183.txt
+initial_model_path: None
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: None
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.354537
+validation_accuracy: 0.84
+
+[2026-04-07T19:20:46] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_SET_3_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_SET_3_100_validation_20260407_192046_604897.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-07T19:20:52] Training completed
+hospital_name: Hospital_C
+round_name: round_003
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_SET_3_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_SET_3_100_validation_20260407_192046_604897.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_003_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.42386
+validation_accuracy: 0.84
+
+[2026-04-09T16:37:07] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260409_163707_077614.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-09T16:37:11] Training completed
+hospital_name: Hospital_C
+round_name: standalone
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260409_163707_077614.txt
+initial_model_path: None
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: None
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.019735
+validation_accuracy: 1.0
+
+[2026-04-09T16:37:37] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260409_163737_008222.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-09T16:37:39] Training completed
+hospital_name: Hospital_C
+round_name: round_004
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260409_163737_008222.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_004_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.001617
+validation_accuracy: 1.0
+
+[2026-04-10T07:23:47] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_072347_887640.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T07:23:52] Training completed
+hospital_name: Hospital_C
+round_name: standalone
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_072347_887640.txt
+initial_model_path: None
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: None
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.019735
+validation_accuracy: 1.0
+
+[2026-04-10T07:24:08] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_072408_671815.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T07:24:14] Training completed
+hospital_name: Hospital_C
+round_name: round_005
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_072408_671815.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_005_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.001052
+validation_accuracy: 1.0
+
+[2026-04-10T11:33:51] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_113351_555621.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T11:33:59] Training completed
+hospital_name: Hospital_C
+round_name: standalone
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_113351_555621.txt
+initial_model_path: None
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: None
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.019735
+validation_accuracy: 1.0
+
+[2026-04-10T11:34:02] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_113402_530761.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T11:34:09] Training completed
+hospital_name: Hospital_C
+round_name: round_006
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_113402_530761.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_006_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.00048
+validation_accuracy: 1.0
+
+[2026-04-10T12:37:31] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_123731_481665.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T12:37:38] Training completed
+hospital_name: Hospital_C
+round_name: standalone
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_123731_481665.txt
+initial_model_path: None
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: None
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.019735
+validation_accuracy: 1.0
+
+[2026-04-10T12:37:53] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_123753_881198.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T12:38:00] Training completed
+hospital_name: Hospital_C
+round_name: round_007
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_123753_881198.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_007_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.000288
+validation_accuracy: 1.0
+
+[2026-04-10T14:33:13] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_143313_602698.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T14:33:19] Training completed
+hospital_name: Hospital_C
+round_name: standalone
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_143313_602698.txt
+initial_model_path: None
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: None
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.019735
+validation_accuracy: 1.0
+
+[2026-04-10T14:33:33] Dataset validation completed
+hospital_name: Hospital_C
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_143333_207485.txt
+missing_columns: None
+invalid_row_count: 0
+suspicious_row_count: 0
+rows_with_missing_features: 0
+
+[2026-04-10T14:33:36] Training completed
+hospital_name: Hospital_C
+round_name: round_008
+status: completed
+dataset_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\uploads\NODE_C_100.csv
+validation_status: PASS
+validation_report_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260410_143333_207485.txt
+initial_model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\received_global_models\current_global_model.pt
+model_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+local_update_path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\communication\local_model_updates\round_008_hospital_c_update.pt
+device: cpu
+training_rows: 75
+validation_rows: 25
+validation_loss: 0.0002
+validation_accuracy: 1.0
+

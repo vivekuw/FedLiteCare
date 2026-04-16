@@ -1,0 +1,56 @@
+FedLiteCare Demo Round Summary
+==============================
+
+Generated At: 2026-04-07T18:30:19
+Round Name: round_002
+Round Number: 2
+Mode: distributed
+
+Global Model Paths
+------------------
+Starting Global Model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+Versioned Global Model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\round_002_global_model.pt
+Latest Global Model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\saved_global_model_versions\global_model_latest.pt
+
+Hospital Results
+----------------
+Hospital_A
+  Validation Status: PASS
+  Validation Accuracy: 1.0000
+  Validation Loss: 0.0021
+  Dataset: NODE_A_100.csv
+  Validation Report: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\reports\validation\NODE_A_100_validation_20260407_183010_165846.txt
+  Local Model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_A\models\hospital_a_diabetes_classifier.pt
+  Aggregator Received Update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_002\hospital_a_update.pt
+  Bytes Received By Aggregator: 4396
+
+Hospital_B
+  Validation Status: PASS
+  Validation Accuracy: 1.0000
+  Validation Loss: 0.0024
+  Dataset: NODE_B_100.csv
+  Validation Report: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\reports\validation\NODE_B_100_validation_20260407_183015_511520.txt
+  Local Model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\models\hospital_b_diabetes_classifier.pt
+  Aggregator Received Update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_002\hospital_b_update.pt
+  Bytes Received By Aggregator: 4400
+
+Hospital_C
+  Validation Status: PASS
+  Validation Accuracy: 1.0000
+  Validation Loss: 0.0026
+  Dataset: NODE_C_100.csv
+  Validation Report: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\reports\validation\NODE_C_100_validation_20260407_183012_522100.txt
+  Local Model: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_C\models\hospital_c_diabetes_classifier.pt
+  Aggregator Received Update: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\received_models\round_002\hospital_c_update.pt
+  Bytes Received By Aggregator: 4417
+
+Key Logs
+--------
+Aggregator Runtime Log: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\logs\aggregator_runtime.log
+Aggregator Log: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\logs\aggregator.log
+Round Log: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Aggregator_Server\logs\round_log.log
+
+Demo Export Files
+-----------------
+Summary Text: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Demo_Outputs\demo_logs\round_002_demo_summary.txt
+Summary JSON: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Demo_Outputs\test_outputs\round_002\demo_summary.json

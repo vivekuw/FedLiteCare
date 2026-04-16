@@ -1,0 +1,36 @@
+FedLiteCare Prediction Report
+============================
+
+Hospital ID: Hospital_B
+Date/Time: 2026-04-10T14:34:37
+Patient Case ID: CASE-20260410-143437
+Model Path: C:\Users\Vivek wadher\OneDrive\Desktop\Documents\New project\FedLite_Project\Hospital_B\communication\received_global_models\current_global_model.pt
+
+Patient Details
+---------------
+- First Name: N/A
+- Last Name: N/A
+- Gender: N/A
+- Date of Birth: N/A
+- Contact Number: N/A
+- Department: N/A
+- Attending Doctor: N/A
+- Address: N/A
+- Visit Notes: N/A
+
+Patient Input Values
+--------------------
+- Pregnancies: 2
+- Glucose: 138
+- BloodPressure: 72
+- SkinThickness: 35
+- Insulin: 0
+- BMI: 33.6
+- DiabetesPedigreeFunction: 0.627
+- Age: 47
+
+Prediction Outcome
+------------------
+Prediction Result: High diabetes risk
+Predicted Label: 1
+Confidence Score: 0.9998
