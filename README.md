@@ -40,6 +40,9 @@ FedLite_Project/
 ├── Register_Daily_FedLiteCare_Task.ps1
 └── README.md
 ```
+## Iamges
+
+📁 **View all screenshots:** [https://github.com/USERNAME/REPOSITORY/tree/main/images](https://github.com/vivekuw/FedLiteCare/tree/master/FedLite_Project/images)
 
 ## Folder Overview
 
